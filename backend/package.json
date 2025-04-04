@@ -1,0 +1,52 @@
+{
+    "name": "eventsentrix-backend",
+    "version": "1.0.0",
+    "description": "Backend for AI-Powered Multichannel Sentiment Monitoring & Real-Time Issue Detection for Events",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js",
+      "dev": "nodemon server.js",
+      "debug": "nodemon --inspect server.js"
+    },
+    "keywords": [
+      "sentiment",
+      "nlp",
+      "events",
+      "monitoring",
+      "real-time",
+      "social-media"
+    ],
+    "author": "Hackathon Team",
+    "license": "MIT",
+    "dependencies": {
+      "@xenova/transformers": "^2.8.0",
+      "axios": "^1.5.0",
+      "bcryptjs": "^2.4.3",
+      "bull": "^4.11.3",
+      "compromise": "^14.10.0",
+      "cors": "^2.8.5",
+      "dotenv": "^16.3.1",
+      "express": "^4.18.2",
+      "express-rate-limit": "^6.9.0",
+      "express-validator": "^7.0.1",
+      "joi": "^17.10.1",
+      "jsonwebtoken": "^9.0.2",
+      "mongoose": "^7.5.0",
+      "morgan": "^1.10.0",
+      "natural": "^6.7.1",
+      "nodemailer": "^6.9.4",
+      "passport": "^0.6.0",
+      "passport-jwt": "^4.0.1",
+      "rate-limit-mongo": "^2.3.2",
+      "socket.io": "^4.7.2",
+      "stopwords": "^0.0.9",
+      "twitter-api-v2": "^1.15.1",
+      "winston": "^3.10.0"
+    },
+    "devDependencies": {
+      "nodemon": "^3.0.1"
+    },
+    "engines": {
+      "node": ">=16.0.0"
+    }
+  }
