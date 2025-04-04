@@ -1,5 +1,5 @@
 {
-    "name": "eventsentrix-backend",
+    "name": "event-sentiment-monitor-server",
     "version": "1.0.0",
     "description": "Backend for AI-Powered Multichannel Sentiment Monitoring & Real-Time Issue Detection for Events",
     "main": "server.js",
