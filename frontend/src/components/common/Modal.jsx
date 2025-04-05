@@ -12,7 +12,6 @@ export const Modal = ({
 }) => {
   const modalRef = useRef(null);
   
-  // Handle Escape key press
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose();

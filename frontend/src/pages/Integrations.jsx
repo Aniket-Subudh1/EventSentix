@@ -33,23 +33,23 @@ const IntegrationCard = ({
   configOptions
 }) => {
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 bg-[#00001A] border border-[#3D3D3D] shadow-lg">
       <div className="flex justify-between items-start">
         <div className="flex items-center">
           {icon}
           <div className="ml-4">
-            <h3 className="text-lg font-medium">{title}</h3>
-            <p className="text-sm text-gray-500 mt-1">{description}</p>
+            <h3 className="text-lg font-medium text-white">{title}</h3>
+            <p className="text-sm text-gray-400 mt-1">{description}</p>
           </div>
         </div>
         
         <div className="flex items-center">
           {connected ? (
-            <span className="flex items-center px-2 py-1 bg-green-100 text-green-800 text-sm rounded-full mr-4">
+            <span className="flex items-center px-2 py-1 bg-green-900/20 text-green-300 text-sm rounded-full mr-4">
               <Check size={14} className="mr-1" /> Connected
             </span>
           ) : (
-            <span className="flex items-center px-2 py-1 bg-gray-100 text-gray-800 text-sm rounded-full mr-4">
+            <span className="flex items-center px-2 py-1 bg-gray-900/20 text-gray-300 text-sm rounded-full mr-4">
               <AlertCircle size={14} className="mr-1" /> Disconnected
             </span>
           )}
@@ -62,6 +62,7 @@ const IntegrationCard = ({
               size="sm"
               onClick={onDisconnect}
               icon={<ZapOff size={16} />}
+              className="border border-[#C53070] text-white hover:bg-[#C53070]/10"
             >
               Disconnect
             </Button>
@@ -71,6 +72,7 @@ const IntegrationCard = ({
               size="sm"
               onClick={onConnect}
               icon={<Power size={16} />}
+              className="bg-[#9D174D] hover:bg-[#C53070] text-white border border-[#C53070]"
             >
               Connect
             </Button>
@@ -80,15 +82,18 @@ const IntegrationCard = ({
       
       {connected && (
         <>
-          <div className="mt-4 p-4 bg-gray-50 rounded-md">
-            <h4 className="text-sm font-medium mb-2">Status</h4>
+          <div className="mt-4 p-4 bg-gray-800 rounded-md">
+            <h4 className="text-sm font-medium text-white mb-2">Status</h4>
             <div className="text-sm">
-              {status && Object.entries(status).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-1 border-b border-gray-200 last:border-0">
-                  <span className="capitalize">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
-                  <span className="font-medium">{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value}</span>
-                </div>
-              ))}
+              {status &&
+                Object.entries(status).map(([key, value]) => (
+                  <div key={key} className="flex justify-between py-1 border-b border-gray-700 last:border-0">
+                    <span className="capitalize text-gray-300">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
+                    <span className="font-medium text-white">
+                      {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value}
+                    </span>
+                  </div>
+                ))}
             </div>
           </div>
           
@@ -99,6 +104,7 @@ const IntegrationCard = ({
                 size="sm"
                 onClick={onConfigure}
                 icon={<Settings size={16} />}
+                className="bg-[#00001A] hover:bg-[#3D3D3D] text-white border border-[#3D3D3D]"
               >
                 Configure
               </Button>
@@ -125,21 +131,16 @@ const IntegrationSettings = ({ selectedEvent }) => {
   
   useEffect(() => {
     fetchIntegrationStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent]);
   
   const fetchIntegrationStatus = async () => {
     try {
       setError(null);
-      
-      // Fetch Twitter status
       const twitter = await integrationService.getTwitterStatus();
       setTwitterStatus(twitter);
-      
-      // Fetch Instagram status
       const instagram = await integrationService.getInstagramStatus();
       setInstagramStatus(instagram);
-      
-      // Fetch LinkedIn status
       const linkedin = await integrationService.getLinkedInStatus();
       setLinkedInStatus(linkedin);
     } catch (err) {
@@ -233,24 +234,21 @@ const IntegrationSettings = ({ selectedEvent }) => {
   };
   
   const handleTwitterConfigure = () => {
-    // Logic to configure Twitter settings
     console.log('Configure Twitter');
   };
   
   const handleInstagramConfigure = () => {
-    // Logic to configure Instagram settings
     console.log('Configure Instagram');
   };
   
   const handleLinkedInConfigure = () => {
-    // Logic to configure LinkedIn settings
     console.log('Configure LinkedIn');
   };
   
   return (
     <div className="space-y-6">
       {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-md mb-6">
+        <div className="bg-red-900/20 text-red-300 p-4 rounded-md mb-6">
           {error}
         </div>
       )}
@@ -304,7 +302,7 @@ const Integrations = () => {
     return (
       <div className="flex h-64 flex-col items-center justify-center p-6">
         <Share2 size={48} className="mb-4 text-gray-400" />
-        <h3 className="text-lg font-medium text-gray-900">No event selected</h3>
+        <h3 className="text-lg font-medium text-gray-300">No event selected</h3>
         <p className="mt-1 text-sm text-gray-500">
           Please select an event to manage integrations.
         </p>
@@ -320,63 +318,64 @@ const Integrations = () => {
   }
   
   return (
-    <div className="p-6">
+    <div className="p-6 bg-[#00001A] min-h-screen">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Integrations</h1>
+        <h1 className="text-2xl font-bold text-white">Integrations</h1>
         
         <Button
           variant="primary"
           onClick={() => window.location.reload()}
           icon={<RefreshCw size={16} className="mr-2" />}
+          className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:rotate-1 border border-[#C53070]"
         >
           Refresh
         </Button>
       </div>
       
-      <Card className="mb-6">
+      <Card className="mb-6 bg-[#00001A] border border-[#3D3D3D] shadow-lg">
         <div className="flex items-center mb-4">
-          <MessageCircle className="text-blue-500 mr-2" size={20} />
-          <h3 className="text-lg font-medium">Integration Status</h3>
+          <MessageCircle className="text-blue-400 mr-2" size={20} />
+          <h3 className="text-lg font-medium text-white">Integration Status</h3>
         </div>
         
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-400 mb-4">
           Connect your event to social media platforms to monitor feedback and sentiment in real-time.
           Integrated data will be automatically collected and analyzed.
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gray-50 p-4 rounded-md">
+          <div className="bg-gray-800 p-4 rounded-md">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-full mr-3">
-                <Twitter className="text-blue-600" size={18} />
+              <div className="p-2 bg-blue-900 rounded-full mr-3">
+                <Twitter className="text-blue-400" size={18} />
               </div>
               <div>
-                <h4 className="font-medium">Twitter</h4>
-                <p className="text-xs text-gray-500">Monitor tweets, hashtags, and mentions</p>
+                <h4 className="font-medium text-white">Twitter</h4>
+                <p className="text-xs text-gray-400">Monitor tweets, hashtags, and mentions</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-50 p-4 rounded-md">
+          <div className="bg-gray-800 p-4 rounded-md">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-full mr-3">
-                <Instagram className="text-purple-600" size={18} />
+              <div className="p-2 bg-purple-900 rounded-full mr-3">
+                <Instagram className="text-purple-500" size={18} />
               </div>
               <div>
-                <h4 className="font-medium">Instagram</h4>
-                <p className="text-xs text-gray-500">Track posts, hashtags, and stories</p>
+                <h4 className="font-medium text-white">Instagram</h4>
+                <p className="text-xs text-gray-400">Track posts, hashtags, and stories</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-50 p-4 rounded-md">
+          <div className="bg-gray-800 p-4 rounded-md">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-full mr-3">
+              <div className="p-2 bg-blue-900 rounded-full mr-3">
                 <Linkedin className="text-blue-700" size={18} />
               </div>
               <div>
-                <h4 className="font-medium">LinkedIn</h4>
-                <p className="text-xs text-gray-500">Monitor company updates and event posts</p>
+                <h4 className="font-medium text-white">LinkedIn</h4>
+                <p className="text-xs text-gray-400">Monitor company updates and event posts</p>
               </div>
             </div>
           </div>

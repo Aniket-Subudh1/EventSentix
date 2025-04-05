@@ -1,7 +1,3 @@
-Below is a detailed README file for your project, **EventSentix**. It covers the overall project description, features, tech stack, architecture overview, environment variable details, installation, usage, and contributing instructions.
-
----
-
 # EventSentix
 
 EventSentix is an AI-powered, multichannel sentiment monitoring and real-time issue detection platform designed specifically for events. It enables event organizers to monitor real-time feedback from various channels—including in-app chats, social media (Twitter, Instagram, LinkedIn), and surveys—while automatically processing and analyzing sentiment, detecting issues, and generating alerts.
@@ -238,6 +234,6 @@ This project is licensed under the ISC License.
 
 ---
 
-EventSentix brings real-time, intelligent event monitoring to your fingertips—empowering organizers with actionable insights and advanced feedback processing. For more details or support, please contact [support@example.com](mailto:support@example.com).
+EventSentix brings real-time, intelligent event monitoring to your fingertips—empowering organizers with actionable insights and advanced feedback processing.
 
 ---

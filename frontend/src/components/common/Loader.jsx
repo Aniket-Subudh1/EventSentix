@@ -5,21 +5,19 @@ export const Loader = ({
   color = 'white', 
   className 
 }) => {
-  // Size styles
   const sizeClasses = {
     sm: 'w-4 h-4 border-2',
-    md: 'w-8 h-8 border-2',
-    lg: 'w-12 h-12 border-3'
+    md: 'w-8 h-8 border-4',
+    lg: 'w-12 h-12 border-4'
   };
   
-  // Color styles
   const colorClasses = {
+    white: 'border-white',
     blue: 'border-blue-600',
     red: 'border-red-600',
     green: 'border-green-600',
     yellow: 'border-yellow-600',
     gray: 'border-gray-600',
-   
   };
   
   return (
@@ -27,7 +25,7 @@ export const Loader = ({
       <div
         className={`
           ${sizeClasses[size] || sizeClasses.md}
-          ${colorClasses[color] || colorClasses.blue}
+          ${colorClasses[color] || colorClasses.white}
           border-t-transparent
           rounded-full
           animate-spin

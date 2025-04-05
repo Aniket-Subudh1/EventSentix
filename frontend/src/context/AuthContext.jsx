@@ -93,7 +93,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Helper for checking authentication status
   const isAuthenticated = () => {
     return authService.isAuthenticated();
   };

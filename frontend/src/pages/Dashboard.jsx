@@ -314,7 +314,7 @@ const Dashboard = () => {
                     }`}
                     onClick={() => setTimeframe(tf)}
                   >
-                    {tf.charAt(0).toUpperCase() + tf.slice(1)}ly
+                    {tf.charAt(0).toUpperCase() + tf.slice(1)}
                   </button>
                 ))}
               </div>
