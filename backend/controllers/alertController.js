@@ -4,6 +4,7 @@ const alertGenerator = require('../services/alert/alertGenerator');
 const socketHandler = require('../services/realtime/socketHandler');
 const asyncHandler = require('../utils/asyncHandler');
 const logger = require('../utils/logger');
+const QRCode = require('qrcode');
 
 exports.getEventAlerts = asyncHandler(async (req, res) => {
 
@@ -242,6 +243,19 @@ exports.updateAlertStatus = asyncHandler(async (req, res) => {
   });
 });
 
+exports.createEvent = asyncHandler(async (req, res) => {
+  const eventData = req.body;
+
+  const newEvent = await Event.create(eventData);
+
+  const qrUrl = `${process.env.FRONTEND_BASE_URL}/event/${newEvent._id}/engage`;
+  const qrImage = await QRCode.toDataURL(qrUrl);
+
+  newEvent.qrCode = qrImage;
+  await newEvent.save();
+
+  res.status(201).json({ success: true, data: newEvent });
+});
 
 exports.assignAlert = asyncHandler(async (req, res) => {
   const { userId } = req.body;

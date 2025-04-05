@@ -8,41 +8,34 @@ const logger = require('../utils/logger');
 
 exports.submitFeedback = asyncHandler(async (req, res) => {
   const { event: eventId, text, source = 'direct', location } = req.body;
-  
 
   const event = await Event.findById(eventId);
   if (!event) {
-    return res.status(404).json({
-      success: false,
-      message: 'Event not found'
-    });
+    return res.status(404).json({ success: false, message: 'Event not found' });
   }
-  
+
   if (!event.isActive) {
-    return res.status(400).json({
-      success: false,
-      message: 'Event is not active'
-    });
+    return res.status(400).json({ success: false, message: 'Event is not active' });
   }
-  
+
+  if (!req.body.sourceId) {
+    req.body.sourceId = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 10)}`;
+  }
+
   const feedbackData = {
     event: eventId,
     source,
+    sourceId: req.body.sourceId,
     text,
-    issueDetails: {
-      location
-    },
+    issueDetails: { location },
     metadata: {
       username: req.body.username || 'Anonymous',
       platform: req.body.platform || source
     }
   };
-  
+
   try {
-
     await feedQueue.addWithHighPriority(feedbackData);
-    
-
     res.status(201).json({
       success: true,
       message: 'Feedback submitted successfully and is being processed',
@@ -53,20 +46,28 @@ exports.submitFeedback = asyncHandler(async (req, res) => {
       }
     });
   } catch (error) {
-
     logger.error(`Queue submission failed, processing directly: ${error.message}`, { error });
-    
 
-    const processedFeedback = await sentimentAnalyzer.processFeedback(feedbackData);
-    const feedback = await Feedback.create(processedFeedback);
-    
-    res.status(201).json({
-      success: true,
-      message: 'Feedback submitted and processed',
-      data: feedback
-    });
+    try {
+      const processedFeedback = await sentimentAnalyzer.processFeedback(feedbackData);
+      const feedback = await Feedback.create(processedFeedback);
+
+      res.status(201).json({
+        success: true,
+        message: 'Feedback submitted and processed',
+        data: feedback
+      });
+    } catch (dbError) {
+      logger.error(`Direct processing also failed: ${dbError.message}`);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to process feedback',
+        error: dbError.message
+      });
+    }
   }
 });
+
 
 exports.twitterWebhook = asyncHandler(async (req, res) => {
 

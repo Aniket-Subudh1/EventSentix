@@ -1,5 +1,5 @@
 {
-    "name": "eventsentrix-frontend",
+    "name": "event-sentiment-monitor",
     "version": "1.0.0",
     "private": true,
     "dependencies": {
@@ -11,6 +11,8 @@
         "chart.js": "^4.2.1",
         "date-fns": "^2.29.3",
         "lodash": "^4.17.21",
+        "qrcode": "^1.5.4",
+        "qrcode.react": "^4.2.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-feather": "^2.0.10",

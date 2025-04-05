@@ -51,6 +51,7 @@ const EventSchema = new mongoose.Schema({
       default: []
     }
   },
+  qrCode: { type: String },
   locationMap: {
     areas: [{
       name: String,
