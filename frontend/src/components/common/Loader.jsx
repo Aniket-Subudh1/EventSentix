@@ -2,7 +2,7 @@ import React from 'react';
 
 export const Loader = ({ 
   size = 'md', 
-  color = 'blue', 
+  color = 'white', 
   className 
 }) => {
   // Size styles
@@ -19,7 +19,7 @@ export const Loader = ({
     green: 'border-green-600',
     yellow: 'border-yellow-600',
     gray: 'border-gray-600',
-    white: 'border-white'
+   
   };
   
   return (

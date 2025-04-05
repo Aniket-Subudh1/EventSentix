@@ -34,7 +34,6 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     { path: '/integrations', name: 'Integrations', icon: <Share2 size={20} />, access: ['admin', 'organizer'] },
     { path: '/users', name: 'User Management', icon: <Users size={20} />, access: ['admin'] },
     { path: '/settings', name: 'Settings', icon: <Settings size={20} />, access: ['admin', 'organizer', 'staff'] },
-    { path: '/help', name: 'Help & Support', icon: <HelpCircle size={20} />, access: ['admin', 'organizer', 'staff'] }
   ];
 
   const filteredMenuItems = menuItems.filter(item => 
@@ -70,7 +69,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       <div className="p-4 flex justify-between items-center">
         {!collapsed && (
           <h1 className="text-xl font-bold bg-gradient-to-r from-[#9D174D] to-[#C53070] bg-clip-text text-transparent">
-            Event Monitor
+            EventSentix
           </h1>
         )}
         <button 
@@ -82,7 +81,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         </button>
       </div>
       
-      <div className="flex-grow overflow-y-auto scrollbar-thin scrollbar-thumb-[#3D3D3D] scrollbar-track-transparent">
+      <div className="flex-grow overflow-y-auto ml-5 scrollbar-thin scrollbar-thumb-[#3D3D3D] scrollbar-track-transparent">
         {user && (
           <div className={`px-4 py-3 ${collapsed ? 'text-center' : 'flex items-center space-x-3'}`}>
             <div className="h-10 w-10 rounded-full bg-[#9D174D] flex items-center justify-center text-white shadow-lg transform transition-all duration-300 hover:scale-110 border border-[#C53070]">

@@ -62,7 +62,6 @@ const Dashboard = () => {
   useEffect(() => {
     if (socket && connected && selectedEvent) {
       const eventId = getEventId()
-
       if (!eventId) return
 
       socket.emit("join-event", { eventId })
@@ -70,13 +69,10 @@ const Dashboard = () => {
 
       const handleNewFeedback = (feedback) => {
         console.log("New feedback received via socket:", feedback)
-
         if (feedback.event === eventId) {
           setDashboardData((prev) => {
             if (!prev) return prev
-
             const sentimentKey = feedback.sentiment || "neutral"
-
             return {
               ...prev,
               feedback: {
@@ -98,7 +94,6 @@ const Dashboard = () => {
 
       const handleNewAlert = (alert) => {
         console.log("New alert received via socket:", alert)
-
         if (alert.event === eventId) {
           setDashboardData((prev) => {
             if (!prev) return prev
@@ -116,14 +111,11 @@ const Dashboard = () => {
 
       const handleAlertUpdate = (alert) => {
         console.log("Alert update received via socket:", alert)
-
         if (alert.event === eventId) {
           setDashboardData((prev) => {
             if (!prev) return prev
-
             const updatedLatest = prev.alerts.latest.map((a) => (a._id === alert._id ? alert : a))
             const activeAdjustment = alert.status === "resolved" ? -1 : 0
-
             return {
               ...prev,
               alerts: {
@@ -154,12 +146,9 @@ const Dashboard = () => {
       const eventId = getEventId()
       if (newFeedback.event === eventId) {
         console.log("New feedback from context:", newFeedback)
-
         setDashboardData((prev) => {
           if (!prev) return prev
-
           const sentimentKey = newFeedback.sentiment || "neutral"
-
           return {
             ...prev,
             feedback: {
@@ -185,7 +174,6 @@ const Dashboard = () => {
       const eventId = getEventId()
       if (newAlert.event === eventId) {
         console.log("New alert from context:", newAlert)
-
         setDashboardData((prev) => {
           if (!prev) return prev
           return {
@@ -202,13 +190,12 @@ const Dashboard = () => {
   }, [newAlert, selectedEvent])
 
   useEffect(() => {
-    if (!selectedEvent) return
-
-    const refreshInterval = setInterval(() => {
-      fetchDashboardData()
-    }, 60000)
-
-    return () => clearInterval(refreshInterval)
+    if (selectedEvent) {
+      const refreshInterval = setInterval(() => {
+        fetchDashboardData()
+      }, 60000)
+      return () => clearInterval(refreshInterval)
+    }
   }, [selectedEvent])
 
   useEffect(() => {
@@ -218,9 +205,19 @@ const Dashboard = () => {
     }
   }, [])
 
+  // Display a dark background loader while data is loading
+  if (loading && !dashboardData) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-[#00001A]">
+        <Loader size="lg" className="text-[#9D174D] animate-spin" />
+      </div>
+    )
+  }
+
+  // If no event is selected (and not loading), prompt user to select one
   if (!selectedEvent) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 animate-fade-in bg-[#00001A] rounded-xl">
+      <div className="flex flex-col items-center justify-center h-96 bg-black animate-fade-in rounded-xl">
         <h2 className="text-xl mb-4 text-white font-semibold">Select an event to view dashboard</h2>
         <Button
           variant="primary"
@@ -228,28 +225,6 @@ const Dashboard = () => {
           className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
         >
           <Calendar size={16} className="mr-2 text-[#9D174D]" /> Go to Events
-        </Button>
-      </div>
-    )
-  }
-
-  if (loading && !dashboardData) {
-    return <Loader size="lg" className="mt-10 text-[#9D174D] animate-spin" />
-  }
-
-  if (error && !dashboardData) {
-    return (
-      <div className="text-center p-6 bg-red-900/20 text-red-300 rounded-xl mt-4 animate-fade-in">
-        <p className="text-lg font-semibold">{error}</p>
-        <p className="mt-2 text-sm">
-          Event data: {selectedEvent ? JSON.stringify(selectedEvent).substring(0, 100) + "..." : "No event selected"}
-        </p>
-        <Button
-          variant="danger"
-          className="mt-4 bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:rotate-2"
-          onClick={fetchDashboardData}
-        >
-          <RefreshCw size={16} className="mr-2 text-[#9D174D]" /> Retry
         </Button>
       </div>
     )
@@ -346,7 +321,7 @@ const Dashboard = () => {
 
           <TrendingTopics
             topics={dashboardData?.trends}
-            className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:rotate-1"
+            className="bg-white/5 text-white backdrop-blur-lg rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:rotate-1"
             style={{ animationDelay: "700ms" }}
           />
         </div>
@@ -354,13 +329,13 @@ const Dashboard = () => {
         <div className="space-y-6">
           <ActiveAlerts
             alerts={dashboardData?.alerts?.latest || []}
-            className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:rotate-1"
+            className="bg-white/5 backdrop-blur-lg  text-white rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:rotate-1"
             style={{ animationDelay: "800ms" }}
           />
 
           <FeedbackStream
             feedback={dashboardData?.feedback?.latest || []}
-            className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:rotate-1"
+            className="bg-white/5 backdrop-blur-lg text-white rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:rotate-1"
             style={{ animationDelay: "900ms" }}
           />
         </div>
@@ -369,4 +344,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default Dashboard;

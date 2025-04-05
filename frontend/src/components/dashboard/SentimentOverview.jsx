@@ -1,4 +1,3 @@
-// src/components/dashboard/SentimentOverview.jsx
 import React from 'react';
 import { Smile, Meh, Frown } from 'react-feather';
 
@@ -6,8 +5,8 @@ const SentimentOverview = ({ sentimentData, className }) => {
   if (!sentimentData) {
     return (
       <div className={className}>
-        <h3 className="text-lg font-semibold mb-4">Sentiment Overview</h3>
-        <p className="text-gray-500">No sentiment data available</p>
+        <h3 className="text-lg font-semibold text-white mb-4">Sentiment Overview</h3>
+        <p className="text-white">No sentiment data available</p>
       </div>
     );
   }
@@ -20,8 +19,7 @@ const SentimentOverview = ({ sentimentData, className }) => {
 
   return (
     <div className={className}>
-      <h3 className="text-lg font-semibold mb-4">Sentiment Overview</h3>
-      
+      <h3 className="text-lg font-semibold text-white mb-4">Sentiment Overview</h3>
       {/* Progress bars */}
       <div className="mb-6">
         <div className="flex h-4 mb-2 bg-gray-200 rounded overflow-hidden">
@@ -53,7 +51,7 @@ const SentimentOverview = ({ sentimentData, className }) => {
           </div>
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-green-500">{sentimentData.positive}</span>
-            <span className="text-sm text-gray-500">{positivePercent}%</span>
+            <span className="text-sm text-black">{positivePercent}%</span>
           </div>
         </div>
         
@@ -64,7 +62,7 @@ const SentimentOverview = ({ sentimentData, className }) => {
           </div>
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-gray-500">{sentimentData.neutral}</span>
-            <span className="text-sm text-gray-500">{neutralPercent}%</span>
+            <span className="text-sm text-black">{neutralPercent}%</span>
           </div>
         </div>
         
@@ -75,7 +73,7 @@ const SentimentOverview = ({ sentimentData, className }) => {
           </div>
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-red-500">{sentimentData.negative}</span>
-            <span className="text-sm text-gray-500">{negativePercent}%</span>
+            <span className="text-sm text-black">{negativePercent}%</span>
           </div>
         </div>
       </div>

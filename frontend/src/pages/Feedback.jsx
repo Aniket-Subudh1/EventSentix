@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { EventContext } from '../context/EventContext';
 import { SocketContext } from '../context/SocketContext';
-import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Modal } from '../components/common/Modal';
 import { Loader } from '../components/common/Loader';
 import FeedbackTable from '../components/tables/FeedbackTable';
 import FeedbackForm from '../components/forms/FeedbackForm';
 import feedbackService from '../services/feedbackService';
-import twitterService from '../services/twitterService'; // Fixed import path
+import twitterService from '../services/twitterService'; 
 import debounce from 'lodash/debounce';
 import { 
   MessageCircle, 
@@ -232,11 +231,10 @@ const Feedback = () => {
     }
   };
 
-  // Rest of the JSX remains unchanged
   return (
     <div className="p-6 bg-[#00001A] min-h-screen">
       <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
           <div>
             <h1 className="text-2xl font-bold mb-2 text-white bg-gradient-to-r from-[#9D174D] to-[#C53070] bg-clip-text text-transparent">
               Feedback Management
@@ -244,50 +242,36 @@ const Feedback = () => {
             {selectedEvent && (
               <div className="flex items-center text-gray-300">
                 <Calendar size={16} className="mr-2 text-[#9D174D]" />
-                {selectedEvent.name} - 
-                {selectedEvent.startDate && new Date(selectedEvent.startDate).toLocaleDateString()} to
-                {selectedEvent.endDate && new Date(selectedEvent.endDate).toLocaleDateString()}
+                {selectedEvent.name} - {selectedEvent.startDate && new Date(selectedEvent.startDate).toLocaleDateString()} to {selectedEvent.endDate && new Date(selectedEvent.endDate).toLocaleDateString()}
               </div>
             )}
           </div>
           
-          {/* <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row sm:space-x-2 mt-4 sm:mt-0">
             <Button
               variant="primary"
-              onClick={() => setIsFeedbackFormOpen(true)}
-              className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
-              icon={<MessageCircle size={16} className="mr-2 text-[#9D174D]" />}
+              onClick={handleTwitterSearch}
+              icon={<Twitter size={16} />}
+              disabled={isSearchingTwitter || !selectedEvent}
+              className="mb-2 sm:mb-0"
             >
-              Add Feedback
+              {isSearchingTwitter ? 'Searching...' : 'Search Twitter'}
             </Button>
             
             <Button
               variant="primary"
               onClick={() => selectedEvent && selectedEvent._id ? debouncedFetchFeedback(selectedEvent._id, pagination.page, filters) : setError('No event selected')}
-              className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
-              icon={<RefreshCw size={16} className="mr-2 text-[#9D174D]" />}
+              icon={<RefreshCw size={16} />}
             >
               Refresh
             </Button>
-          </div> */}
-          <Button
-            variant="primary"
-            onClick={handleTwitterSearch}
-            icon={<Twitter size={16} />}
-            disabled={isSearchingTwitter || !selectedEvent}
-          >
-            {isSearchingTwitter ? 'Searching...' : 'Search Twitter'}
-          </Button>
-          
-          <Button
-            variant="primary"
-            onClick={() => selectedEvent && selectedEvent._id ? debouncedFetchFeedback(selectedEvent._id, pagination.page, filters) : setError('No event selected')}
-            icon={<RefreshCw size={16} />}
-          >
-            Refresh
-          </Button>
+          </div>
         </div>
-        {loading && feedback.length > 0 && <div className="mt-2 text-sm text-gray-400 animate-pulse">Refreshing data...</div>}
+        {loading && feedback.length > 0 && (
+          <div className="mt-2 text-sm text-gray-400 animate-pulse">
+            Refreshing data...
+          </div>
+        )}
       </div>
       
       {error && (
@@ -306,7 +290,7 @@ const Feedback = () => {
           <Button
             variant="primary"
             className="mt-4 bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
-            onClick={() => window.location.href = '/events'}
+            onClick={() => (window.location.href = '/events')}
           >
             Go to Events
           </Button>
@@ -316,7 +300,7 @@ const Feedback = () => {
           <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center mb-4 sm:mb-0">
-                <Filter size={18} className="mr-2 text-[#9D174D]" />
+                <Filter size={22} className="mr-2 text-[#9D174D]" />
                 <h2 className="text-lg font-medium text-white">Filters</h2>
               </div>
               
@@ -352,7 +336,7 @@ const Feedback = () => {
                 <select
                   id="sentiment"
                   name="sentiment"
-                  className="block w-full rounded-md bg-white/5 border-gray-600 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
+                  className="block w-full rounded-md bg-gray-800 border border-gray-700 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   value={filters.sentiment}
                   onChange={handleFilterChange}
                 >
@@ -370,7 +354,7 @@ const Feedback = () => {
                 <select
                   id="source"
                   name="source"
-                  className="block w-full rounded-md bg-white/5 border-gray-600 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
+                  className="block w-full rounded-md bg-gray-800 border border-gray-700 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   value={filters.source}
                   onChange={handleFilterChange}
                 >
@@ -391,7 +375,7 @@ const Feedback = () => {
                 <select
                   id="issueType"
                   name="issueType"
-                  className="block w-full rounded-md bg-white/5 border-gray-600 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
+                  className="block w-full rounded-md bg-gray-800 border border-gray-700 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   value={filters.issueType}
                   onChange={handleFilterChange}
                 >
@@ -416,7 +400,7 @@ const Feedback = () => {
                   type="text"
                   id="search"
                   name="search"
-                  className="block w-full rounded-md bg-white/5 border-gray-600 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
+                  className="block w-full rounded-md bg-gray-800 border border-gray-700 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   placeholder="Search feedback..."
                   value={filters.search}
                   onChange={handleFilterChange}
@@ -437,7 +421,7 @@ const Feedback = () => {
                     type="date"
                     id="startDate"
                     name="startDate"
-                    className="focus:ring-[#9D174D] focus:border-[#9D174D] block w-full pl-10 sm:text-sm bg-white/5 border-gray-600 text-white rounded-md"
+                    className="focus:ring-[#9D174D] focus:border-[#9D174D] block w-full pl-10 sm:text-sm bg-gray-800 border border-gray-700 text-white rounded-md"
                     value={filters.startDate}
                     onChange={handleFilterChange}
                   />
@@ -456,7 +440,7 @@ const Feedback = () => {
                     type="date"
                     id="endDate"
                     name="endDate"
-                    className="focus:ring-[#9D174D] focus:border-[#9D174D] block w-full pl-10 sm:text-sm bg-white/5 border-gray-600 text-white rounded-md"
+                    className="focus:ring-[#9D174D] focus:border-[#9D174D] block w-full pl-10 sm:text-sm bg-gray-800 border border-gray-700 text-white rounded-md"
                     value={filters.endDate}
                     onChange={handleFilterChange}
                   />
@@ -506,7 +490,7 @@ const Feedback = () => {
                 <MessageCircle size={48} className="text-[#9D174D] mb-4" />
                 <p className="text-white text-lg">No feedback found</p>
                 <p className="text-gray-400 text-sm mt-2">
-                  Try adjusting your filters or adding new feedback
+                  Try adjusting your filters or adding new feedback.
                 </p>
               </div>
             ) : (
@@ -725,7 +709,7 @@ const Feedback = () => {
                 </label>
                 <select
                   id="batch-issueType"
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base bg-white/5 border-gray-600 text-white focus:outline-none focus:ring-[#9D174D] focus:border-[#9D174D] sm:text-sm rounded-md"
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-[#9D174D] focus:border-[#9D174D] sm:text-sm rounded-md"
                   value={batchAction.issueType}
                   onChange={(e) => setBatchAction({...batchAction, issueType: e.target.value})}
                 >
@@ -747,7 +731,7 @@ const Feedback = () => {
                   id="batch-processed"
                   name="processed"
                   type="checkbox"
-                  className="h-4 w-4 text-[#9D174D] focus:ring-[#9D174D] border-gray-600 rounded bg-white/5"
+                  className="h-4 w-4 text-[#9D174D] focus:ring-[#9D174D] border-gray-700 rounded bg-gray-800"
                   checked={batchAction.processed}
                   onChange={(e) => setBatchAction({...batchAction, processed: e.target.checked})}
                 />
@@ -761,7 +745,7 @@ const Feedback = () => {
                   id="batch-resolved"
                   name="resolved"
                   type="checkbox"
-                  className="h-4 w-4 text-[#9D174D] focus:ring-[#9D174D] border-gray-600 rounded bg-white/5"
+                  className="h-4 w-4 text-[#9D174D] focus:ring-[#9D174D] border-gray-700 rounded bg-gray-800"
                   checked={batchAction.resolved}
                   onChange={(e) => setBatchAction({...batchAction, resolved: e.target.checked})}
                 />

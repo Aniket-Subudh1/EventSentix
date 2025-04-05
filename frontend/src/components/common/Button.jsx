@@ -13,7 +13,7 @@ export const Button = ({
   ...rest
 }) => {
   const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
+    primary: 'bg-pink-600 hover:bg-pink-700 text-white',
     secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
     success: 'bg-green-500 hover:bg-green-600 text-white',
     danger: 'bg-red-500 hover:bg-red-600 text-white',
@@ -29,12 +29,10 @@ export const Button = ({
     lg: 'px-6 py-3 text-lg'
   };
   
-  // Disabled styles
   const disabledClasses = disabled 
     ? 'opacity-50 cursor-not-allowed' 
     : 'transition duration-200';
   
-  // Width styles
   const widthClasses = fullWidth ? 'w-full' : '';
   
   return (

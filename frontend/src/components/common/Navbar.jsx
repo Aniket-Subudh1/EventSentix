@@ -66,7 +66,7 @@ export const Navbar = ({ toggleSidebar }) => {
         </button>
         
         <Link to="/" className="ml-3 text-xl font-bold bg-gradient-to-r from-[#9D174D] to-[#C53070] bg-clip-text text-transparent">
-          Event Sentiment Monitor
+          EventSentrix
         </Link>
       </div>
       

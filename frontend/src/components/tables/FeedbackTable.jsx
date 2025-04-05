@@ -19,7 +19,7 @@ const FeedbackTable = ({
         return <Frown className="text-red-500" size={18} />;
       case 'neutral':
       default:
-        return <Meh className="text-gray-500" size={18} />;
+        return <Meh className="text-gray-400" size={18} />;
     }
   };
   
@@ -37,7 +37,7 @@ const FeedbackTable = ({
       case 'survey':
         return <MessageCircle size={16} className="text-orange-500" />;
       default:
-        return <MessageCircle size={16} className="text-gray-500" />;
+        return <MessageCircle size={16} className="text-gray-400" />;
     }
   };
   
@@ -77,55 +77,55 @@ const FeedbackTable = ({
   
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-gray-700">
+        <thead className="bg-gray-800">
           <tr>
             {setSelectedFeedback && (
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
                   checked={selectedFeedback.length === feedback.length && feedback.length > 0}
                   onChange={handleSelectAll}
                 />
               </th>
             )}
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Sentiment
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Feedback
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Source
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Location
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Time
             </th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
               Actions
             </th>
           </tr>
         </thead>
         
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-[#00001A] divide-y divide-gray-700">
           {feedback.length === 0 ? (
             <tr>
-              <td colSpan={setSelectedFeedback ? "7" : "6"} className="px-6 py-4 text-center text-sm text-gray-500">
+              <td colSpan={setSelectedFeedback ? "7" : "6"} className="px-6 py-4 text-center text-sm text-gray-400">
                 No feedback found
               </td>
             </tr>
           ) : (
             feedback.map((item) => (
-              <tr key={item._id} className="hover:bg-gray-50">
+              <tr key={item._id} className="hover:bg-gray-900">
                 {setSelectedFeedback && (
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
                       checked={selectedFeedback.includes(item._id)}
                       onChange={() => handleSelectFeedback(item._id)}
                     />
@@ -135,12 +135,12 @@ const FeedbackTable = ({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     {getSentimentIcon(item.sentiment)}
-                    <span className="ml-1 text-xs font-medium capitalize">{item.sentiment}</span>
+                    <span className="ml-1 text-xs font-medium capitalize text-gray-300">{item.sentiment}</span>
                   </div>
                 </td>
                 
                 <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900 line-clamp-2">{item.text}</div>
+                  <div className="text-sm text-gray-100 line-clamp-2">{item.text}</div>
                   {item.issueType && (
                     <span className="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                       {item.issueType}
@@ -149,12 +149,12 @@ const FeedbackTable = ({
                 </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center text-sm text-gray-500">
+                  <div className="flex items-center text-sm text-gray-400">
                     {getSourceIcon(item.source)}
                     <span className="ml-1 capitalize">{item.source}</span>
                   </div>
                   {item.metadata?.username && (
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-500">
                       {item.metadata.username}
                     </div>
                   )}
@@ -162,16 +162,16 @@ const FeedbackTable = ({
                 
                 <td className="px-6 py-4 whitespace-nowrap">
                   {item.issueDetails?.location ? (
-                    <div className="flex items-center text-sm text-gray-500">
+                    <div className="flex items-center text-sm text-gray-400">
                       <MapPin size={14} className="mr-1" />
                       {item.issueDetails.location}
                     </div>
                   ) : (
-                    <span className="text-sm text-gray-400">—</span>
+                    <span className="text-sm text-gray-500">—</span>
                   )}
                 </td>
                 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                   <div className="flex items-center">
                     <Clock className="mr-1" size={14} />
                     {formatTime(item.createdAt)}
@@ -182,7 +182,7 @@ const FeedbackTable = ({
                   <div className="flex justify-end space-x-2">
                     <button
                       onClick={() => onViewDetails(item)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-blue-400 hover:text-blue-600"
                     >
                       View
                     </button>
@@ -190,7 +190,7 @@ const FeedbackTable = ({
                     {item.sourceId && (
                       <a 
                         href="#" 
-                        className="text-purple-600 hover:text-purple-900"
+                        className="text-purple-400 hover:text-purple-600"
                         title="View original"
                       >
                         <ExternalLink size={16} />
@@ -199,7 +199,7 @@ const FeedbackTable = ({
                     
                     <button
                       onClick={() => onDelete(item._id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-400 hover:text-red-600"
                     >
                       Delete
                     </button>

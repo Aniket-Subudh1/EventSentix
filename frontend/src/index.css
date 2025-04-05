@@ -9,10 +9,7 @@
   --accent-foreground: 0 0% 100%;
 }
 
-body {
-  background-color: #020617;
-  color: #f8fafc;
-}
+
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
