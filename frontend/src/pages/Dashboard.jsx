@@ -1,103 +1,101 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useContext, useCallback } from "react"
-import { EventContext } from "../context/EventContext"
-import { SocketContext } from "../context/SocketContext"
-import analyticsService from "../services/analyticsService"
+import { useState, useEffect, useContext } from "react";
+import { EventContext } from "../context/EventContext";
+import { SocketContext } from "../context/SocketContext";
+import analyticsService from "../services/analyticsService";
 
-import SentimentOverview from "../components/dashboard/SentimentOverview"
-import ActiveAlerts from "../components/dashboard/ActiveAlerts"
-import FeedbackStream from "../components/dashboard/FeedbackStream"
-import TrendingTopics from "../components/dashboard/TrendingTopics"
-import SentimentChart from "../components/charts/SentimentChart"
-import { Loader } from "../components/common/Loader"
-import { Button } from "../components/common/Button"
+import SentimentOverview from "../components/dashboard/SentimentOverview";
+import ActiveAlerts from "../components/dashboard/ActiveAlerts";
+import FeedbackStream from "../components/dashboard/FeedbackStream";
+import TrendingTopics from "../components/dashboard/TrendingTopics";
+import SentimentChart from "../components/charts/SentimentChart";
+import { Loader } from "../components/common/Loader";
+import { Button } from "../components/common/Button";
 
 // Icons
-import { Calendar, Users, MessageCircle, Bell, Clock, RefreshCw } from "react-feather"
+import { Calendar, Users, MessageCircle, Bell, Clock, RefreshCw } from "react-feather";
 
 const Dashboard = () => {
-  const { selectedEvent } = useContext(EventContext)
-  const { socket, connected, newFeedback, newAlert } = useContext(SocketContext)
+  const { selectedEvent } = useContext(EventContext);
+  const { socket, connected, newFeedback, newAlert } = useContext(SocketContext);
 
-  const [dashboardData, setDashboardData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [timeframe, setTimeframe] = useState("day")
-  const [lastRefresh, setLastRefresh] = useState(Date.now())
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [timeframe, setTimeframe] = useState("day");
+  const [lastRefresh, setLastRefresh] = useState(Date.now());
 
   const getEventId = () => {
-    if (!selectedEvent) return null
-    return selectedEvent.id || selectedEvent._id || selectedEvent.eventId || selectedEvent.event_id
-  }
+    if (!selectedEvent) return null;
+    return selectedEvent.id || selectedEvent._id || selectedEvent.eventId || selectedEvent.event_id;
+  };
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const eventId = getEventId()
+      const eventId = getEventId();
       if (!eventId) {
-        throw new Error("Invalid or missing event ID")
+        throw new Error("Invalid or missing event ID");
       }
 
-      console.log("Fetching dashboard data for event:", eventId)
-      const data = await analyticsService.getDashboardData(eventId)
-      console.log("Dashboard data fetched:", data)
-      setDashboardData(data)
-      setLastRefresh(Date.now())
+      console.log("Fetching dashboard data for event:", eventId);
+      const data = await analyticsService.getDashboardData(eventId);
+      console.log("Dashboard data fetched:", data);
+      setDashboardData(data);
+      setLastRefresh(Date.now());
     } catch (err) {
-      console.error("Error fetching dashboard data:", err)
-      setError(err.message || "Failed to load dashboard data")
+      console.error("Error fetching dashboard data:", err);
+      setError(err.message || "Failed to load dashboard data");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (selectedEvent) {
-      fetchDashboardData()
+      fetchDashboardData();
     }
-  }, [selectedEvent])
+  }, [selectedEvent]);
 
   useEffect(() => {
     if (socket && connected && selectedEvent) {
-      const eventId = getEventId()
-      if (!eventId) return
+      const eventId = getEventId();
+      if (!eventId) return;
 
-      socket.emit("join-event", { eventId })
-      socket.emit("subscribe-alerts", { eventId })
+      socket.emit("join-event", { eventId });
+      socket.emit("subscribe-alerts", { eventId });
 
       const handleNewFeedback = (feedback) => {
-        console.log("New feedback received via socket:", feedback)
+        console.log("New feedback received via socket:", feedback);
         if (feedback.event === eventId) {
           setDashboardData((prev) => {
-            if (!prev) return prev
-            const sentimentKey = feedback.sentiment || "neutral"
+            if (!prev) return prev;
+            const sentimentKey = feedback.sentiment || "neutral";
             return {
               ...prev,
               feedback: {
                 ...prev.feedback,
                 latest: [feedback, ...prev.feedback.latest.slice(0, 4)],
                 recent: (prev.feedback.recent || 0) + 1,
+                // Instead of storing an object, we now update the count as a number
                 sentiment: {
                   ...prev.feedback.sentiment,
-                  [sentimentKey]: {
-                    ...prev.feedback.sentiment[sentimentKey],
-                    count: (prev.feedback.sentiment[sentimentKey]?.count || 0) + 1,
-                  },
+                  [sentimentKey]: (prev.feedback.sentiment[sentimentKey] || 0) + 1,
                 },
               },
-            }
-          })
+            };
+          });
         }
-      }
+      };
 
       const handleNewAlert = (alert) => {
-        console.log("New alert received via socket:", alert)
+        console.log("New alert received via socket:", alert);
         if (alert.event === eventId) {
           setDashboardData((prev) => {
-            if (!prev) return prev
+            if (!prev) return prev;
             return {
               ...prev,
               alerts: {
@@ -105,18 +103,18 @@ const Dashboard = () => {
                 latest: [alert, ...prev.alerts.latest.slice(0, 4)],
                 active: (prev.alerts.active || 0) + 1,
               },
-            }
-          })
+            };
+          });
         }
-      }
+      };
 
       const handleAlertUpdate = (alert) => {
-        console.log("Alert update received via socket:", alert)
+        console.log("Alert update received via socket:", alert);
         if (alert.event === eventId) {
           setDashboardData((prev) => {
-            if (!prev) return prev
-            const updatedLatest = prev.alerts.latest.map((a) => (a._id === alert._id ? alert : a))
-            const activeAdjustment = alert.status === "resolved" ? -1 : 0
+            if (!prev) return prev;
+            const updatedLatest = prev.alerts.latest.map((a) => (a._id === alert._id ? alert : a));
+            const activeAdjustment = alert.status === "resolved" ? -1 : 0;
             return {
               ...prev,
               alerts: {
@@ -124,59 +122,57 @@ const Dashboard = () => {
                 latest: updatedLatest,
                 active: Math.max(0, (prev.alerts.active || 0) + activeAdjustment),
               },
-            }
-          })
+            };
+          });
         }
-      }
+      };
 
-      socket.on("new-feedback", handleNewFeedback)
-      socket.on("new-alert", handleNewAlert)
-      socket.on("alert-updated", handleAlertUpdate)
+      socket.on("new-feedback", handleNewFeedback);
+      socket.on("new-alert", handleNewAlert);
+      socket.on("alert-updated", handleAlertUpdate);
 
       return () => {
-        socket.off("new-feedback", handleNewFeedback)
-        socket.off("new-alert", handleNewAlert)
-        socket.off("alert-updated", handleAlertUpdate)
-        socket.emit("leave-event", { eventId })
-      }
+        socket.off("new-feedback", handleNewFeedback);
+        socket.off("new-alert", handleNewAlert);
+        socket.off("alert-updated", handleAlertUpdate);
+        socket.emit("leave-event", { eventId });
+      };
     }
-  }, [socket, connected, selectedEvent])
+  }, [socket, connected, selectedEvent]);
 
   useEffect(() => {
     if (newFeedback && selectedEvent) {
-      const eventId = getEventId()
+      const eventId = getEventId();
       if (newFeedback.event === eventId) {
-        console.log("New feedback from context:", newFeedback)
+        console.log("New feedback from context:", newFeedback);
         setDashboardData((prev) => {
-          if (!prev) return prev
-          const sentimentKey = newFeedback.sentiment || "neutral"
+          if (!prev) return prev;
+          const sentimentKey = newFeedback.sentiment || "neutral";
           return {
             ...prev,
             feedback: {
               ...prev.feedback,
               latest: [newFeedback, ...prev.feedback.latest.slice(0, 4)],
               recent: (prev.feedback.recent || 0) + 1,
+              // Update sentiment count as a number
               sentiment: {
                 ...prev.feedback.sentiment,
-                [sentimentKey]: {
-                  ...prev.feedback.sentiment[sentimentKey],
-                  count: (prev.feedback.sentiment[sentimentKey]?.count || 0) + 1,
-                },
+                [sentimentKey]: (prev.feedback.sentiment[sentimentKey] || 0) + 1,
               },
             },
-          }
-        })
+          };
+        });
       }
     }
-  }, [newFeedback, selectedEvent])
+  }, [newFeedback, selectedEvent]);
 
   useEffect(() => {
     if (newAlert && selectedEvent) {
-      const eventId = getEventId()
+      const eventId = getEventId();
       if (newAlert.event === eventId) {
-        console.log("New alert from context:", newAlert)
+        console.log("New alert from context:", newAlert);
         setDashboardData((prev) => {
-          if (!prev) return prev
+          if (!prev) return prev;
           return {
             ...prev,
             alerts: {
@@ -184,27 +180,27 @@ const Dashboard = () => {
               latest: [newAlert, ...prev.alerts.latest.slice(0, 4)],
               active: (prev.alerts.active || 0) + 1,
             },
-          }
-        })
+          };
+        });
       }
     }
-  }, [newAlert, selectedEvent])
+  }, [newAlert, selectedEvent]);
 
   useEffect(() => {
     if (selectedEvent) {
       const refreshInterval = setInterval(() => {
-        fetchDashboardData()
-      }, 60000)
-      return () => clearInterval(refreshInterval)
+        fetchDashboardData();
+      }, 60000);
+      return () => clearInterval(refreshInterval);
     }
-  }, [selectedEvent])
+  }, [selectedEvent]);
 
   useEffect(() => {
-    const dashboardElement = document.getElementById("dashboard-content")
+    const dashboardElement = document.getElementById("dashboard-content");
     if (dashboardElement) {
-      dashboardElement.classList.add("animate-fade-in")
+      dashboardElement.classList.add("animate-fade-in");
     }
-  }, [])
+  }, []);
 
   // Display a dark background loader while data is loading
   if (loading && !dashboardData) {
@@ -212,7 +208,7 @@ const Dashboard = () => {
       <div className="flex items-center justify-center h-screen bg-[#00001A]">
         <Loader size="lg" className="text-[#9D174D] animate-spin" />
       </div>
-    )
+    );
   }
 
   // If no event is selected (and not loading), prompt user to select one
@@ -228,7 +224,7 @@ const Dashboard = () => {
           <Calendar size={16} className="mr-2 text-[#9D174D]" /> Go to Events
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -246,7 +242,13 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="flex space-x-2">
-            <div className={`px-3 py-1 rounded-full text-white transition-all duration-300 border ${selectedEvent.isActive ? "bg-green-500/20 text-green-300 border-green-700" : "bg-red-500/20 text-red-300 border-red-700"}`}>
+            <div
+              className={`px-3 py-1 rounded-full text-white transition-all duration-300 border ${
+                selectedEvent.isActive
+                  ? "bg-green-500/20 text-green-300 border-green-700"
+                  : "bg-red-500/20 text-red-300 border-red-700"
+              }`}
+            >
               {selectedEvent.isActive ? "Active" : "Inactive"}
             </div>
             <Button
@@ -330,7 +332,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           <ActiveAlerts
             alerts={dashboardData?.alerts?.latest || []}
-            className="bg-white/5 backdrop-blur-lg  text-white rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:rotate-1"
+            className="bg-white/5 backdrop-blur-lg text-white rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:rotate-1"
             style={{ animationDelay: "800ms" }}
           />
 
@@ -342,7 +344,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Dashboard;
