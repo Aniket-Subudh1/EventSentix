@@ -16,6 +16,17 @@ const FeedbackSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  user: {
+    type: String,
+    default: 'Anonymous',
+    trim: true,
+    maxlength: 100
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   text: {
     type: String,
     required: true,

@@ -27,12 +27,16 @@ exports.submitFeedback = asyncHandler(async (req, res) => {
     source,
     sourceId: req.body.sourceId,
     text,
+    user: typeof req.body.username === 'string' && req.body.username.trim()
+      ? req.body.username.trim()
+      : 'Anonymous',
+    userId: req.body.userId || null,
     issueDetails: { location },
     metadata: {
-      username: req.body.username || 'Anonymous',
       platform: req.body.platform || source
     }
   };
+  
 
   try {
     await feedQueue.addWithHighPriority(feedbackData);
