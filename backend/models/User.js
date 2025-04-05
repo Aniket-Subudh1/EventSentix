@@ -35,7 +35,7 @@ const UserSchema = new mongoose.Schema({
       threshold: { type: String, enum: ['all', 'critical', 'none'], default: 'critical' }
     },
     sms: {
-      enabled: { type: Boolean, default: false },
+      enabled: { type: Boolean, default: true },
       phoneNumber: { type: String, default: '' },
       threshold: { type: String, enum: ['all', 'critical', 'none'], default: 'critical' }
     },

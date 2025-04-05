@@ -22,8 +22,7 @@ const initTwilioClient = () => {
     }
   }
   
-  // Return a mock client for development environments without Twilio credentials
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'production') {
     logger.info('No Twilio credentials found. Using mock Twilio client.');
     return {
       messages: {
