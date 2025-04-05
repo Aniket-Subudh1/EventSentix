@@ -205,8 +205,19 @@ exports.updatePassword = asyncHandler(async (req, res) => {
   sendTokenResponse(user, 200, res);
 });
 
+
 exports.updateAlertPreferences = asyncHandler(async (req, res) => {
   const { alertPreferences } = req.body;
+
+  if (alertPreferences.sms && alertPreferences.sms.enabled && alertPreferences.sms.phoneNumber) {
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(alertPreferences.sms.phoneNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number must be in international format with a plus (+) sign and country code, e.g., +12345678900'
+      });
+    }
+  }
 
   const user = await User.findByIdAndUpdate(
     req.user.id,

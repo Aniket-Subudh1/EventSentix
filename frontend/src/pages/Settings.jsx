@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
@@ -10,7 +10,8 @@ import {
   Bell, 
   Lock, 
   Shield,  
-  LogOut 
+  LogOut,
+  MessageCircle 
 } from 'react-feather';
 
 const Settings = () => {
@@ -25,16 +26,41 @@ const Settings = () => {
   
   // Provide default alert preferences if user.alertPreferences is undefined
   const [alertPreferences, setAlertPreferences] = useState({
-    emailNotifications: user?.alertPreferences?.emailNotifications ?? true,
-    pushNotifications: user?.alertPreferences?.pushNotifications ?? true,
+    emailNotifications: user?.alertPreferences?.email?.enabled ?? true,
+    pushNotifications: user?.alertPreferences?.push?.enabled ?? true,
+    smsNotifications: user?.alertPreferences?.sms?.enabled ?? false,
+    phoneNumber: user?.alertPreferences?.sms?.phoneNumber || '',
     alertThresholds: {
       negative: user?.alertPreferences?.alertThresholds?.negative ?? -0.5,
       critical: user?.alertPreferences?.alertThresholds?.critical ?? 3
     }
   });
   
+  useEffect(() => {
+    // Update state when user data changes
+    if (user) {
+      setProfileData({
+        name: user.name || '',
+        email: user.email || '',
+        role: user.role || ''
+      });
+      
+      setAlertPreferences({
+        emailNotifications: user.alertPreferences?.email?.enabled ?? true,
+        pushNotifications: user.alertPreferences?.push?.enabled ?? true,
+        smsNotifications: user.alertPreferences?.sms?.enabled ?? false,
+        phoneNumber: user.alertPreferences?.sms?.phoneNumber || '',
+        alertThresholds: {
+          negative: user.alertPreferences?.alertThresholds?.negative ?? -0.5,
+          critical: user.alertPreferences?.alertThresholds?.critical ?? 3
+        }
+      });
+    }
+  }, [user]);
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [phoneError, setPhoneError] = useState(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -68,6 +94,17 @@ const Settings = () => {
         [name]: type === 'checkbox' ? checked : value
       }));
     }
+
+    // Clear phone error when user starts typing
+    if (name === 'phoneNumber') {
+      setPhoneError(null);
+    }
+  };
+  
+  const validatePhoneNumber = (phoneNumber) => {
+    // Simple validation: should start with + and have 7-15 digits
+    const phoneRegex = /^\+[1-9]\d{6,14}$/;
+    return phoneRegex.test(phoneNumber);
   };
   
   const handleProfileUpdate = async (e) => {
@@ -87,10 +124,37 @@ const Settings = () => {
   const handleAlertPreferencesUpdate = async (e) => {
     e.preventDefault();
     
+    // Validate phone number if SMS notifications are enabled
+    if (alertPreferences.smsNotifications && alertPreferences.phoneNumber) {
+      if (!validatePhoneNumber(alertPreferences.phoneNumber)) {
+        setPhoneError('Please enter a valid phone number with country code (e.g., +12345678900)');
+        return;
+      }
+    }
+    
     try {
       setLoading(true);
       setError(null);
-      await updateAlertPreferences(alertPreferences);
+      setPhoneError(null);
+      
+      // Convert to the format expected by the backend
+      const apiAlertPreferences = {
+        email: {
+          enabled: alertPreferences.emailNotifications,
+          threshold: 'critical' // Fixed value for now
+        },
+        sms: {
+          enabled: alertPreferences.smsNotifications,
+          phoneNumber: alertPreferences.phoneNumber,
+          threshold: 'critical' // Fixed value for now
+        },
+        push: {
+          enabled: alertPreferences.pushNotifications,
+          threshold: 'all' // Fixed value for now
+        }
+      };
+      
+      await updateAlertPreferences(apiAlertPreferences);
     } catch (err) {
       setError(err.message || 'Failed to update alert preferences');
     } finally {
@@ -282,7 +346,7 @@ const Settings = () => {
                   </label>
                 </div>
                 
-                <div className="flex items-center">
+                <div className="flex items-center mb-2">
                   <input
                     type="checkbox"
                     id="pushNotifications"
@@ -294,6 +358,43 @@ const Settings = () => {
                   <label htmlFor="pushNotifications" className="text-sm font-medium text-gray-700">
                     Push Notifications
                   </label>
+                </div>
+                
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="smsNotifications"
+                    name="smsNotifications"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-2"
+                    checked={alertPreferences.smsNotifications}
+                    onChange={handleAlertPreferencesChange}
+                  />
+                  <label htmlFor="smsNotifications" className="text-sm font-medium text-gray-700">
+                    SMS Notifications
+                  </label>
+                </div>
+                
+                <div className="mt-4">
+                  <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                    Phone Number (with country code)
+                  </label>
+                  <input
+                    type="tel"
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    className={`mt-1 block w-full rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+                      phoneError ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    value={alertPreferences.phoneNumber}
+                    onChange={handleAlertPreferencesChange}
+                    placeholder="+12345678900"
+                  />
+                  {phoneError && (
+                    <p className="mt-1 text-xs text-red-600">{phoneError}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    Enter your phone number with country code to receive SMS alerts
+                  </p>
                 </div>
               </div>
               

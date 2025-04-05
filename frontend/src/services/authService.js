@@ -155,8 +155,15 @@ const authService = {
   updateAlertPreferences: async (preferences) => {
     try {
       const response = await api.put('/auth/alert-preferences', { alertPreferences: preferences });
+      
+      // Update the user in localStorage with the new preferences
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      currentUser.alertPreferences = response.data.data;
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      
       return response.data.data;
     } catch (error) {
+      console.error('Error updating alert preferences:', error);
       throw error.response?.data?.message || 'Failed to update alert preferences';
     }
   },

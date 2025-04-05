@@ -12,14 +12,12 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       try {
         setLoading(true);
-        // Check if user is already logged in
         const userData = await authService.getCurrentUser();
         if (userData) {
           setUser(userData);
         }
       } catch (err) {
         console.error('Auth initialization error:', err);
-        // Clear any invalid tokens
         authService.logout();
       } finally {
         setLoading(false);
@@ -95,6 +93,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Helper for checking authentication status
+  const isAuthenticated = () => {
+    return authService.isAuthenticated();
+  };
+
   const value = {
     user,
     loading,
@@ -103,7 +106,8 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateProfile,
-    updateAlertPreferences
+    updateAlertPreferences,
+    isAuthenticated
   };
 
   return (

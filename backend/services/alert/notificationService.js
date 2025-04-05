@@ -4,6 +4,40 @@ const Alert = require('../../models/Alert');
 const sendEmail = require('../../utils/sendEmail');
 const logger = require('../../utils/logger');
 
+const initTwilioClient = () => {
+  if (
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_PHONE_NUMBER
+  ) {
+    try {
+      const twilio = require('twilio')(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_AUTH_TOKEN
+      );
+      return twilio;
+    } catch (error) {
+      logger.error(`Twilio initialization error: ${error.message}`, { error });
+      return null;
+    }
+  }
+  
+  // Return a mock client for development environments without Twilio credentials
+  if (process.env.NODE_ENV === 'development') {
+    logger.info('No Twilio credentials found. Using mock Twilio client.');
+    return {
+      messages: {
+        create: async (messageData) => {
+          logger.info(`[MOCK SMS] To: ${messageData.to}, Body: ${messageData.body}`);
+          return { sid: 'MOCK_SMS_SID' };
+        }
+      }
+    };
+  }
+  
+  return null;
+};
+
 exports.sendAlertNotification = async (alert) => {
   try {
     if (alert.notificationSent) {
@@ -125,28 +159,34 @@ View and manage this alert at: ${process.env.CLIENT_URL || 'http://localhost:300
 
 const sendSmsNotifications = async (users, alert, event) => {
   try {
-    if (users.sms.length === 0 || !process.env.TWILIO_ACCOUNT_SID) {
+    if (users.sms.length === 0) {
       return true;
     }
     
-    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-      const twilio = require('twilio')(
-        process.env.TWILIO_ACCOUNT_SID,
-        process.env.TWILIO_AUTH_TOKEN
-      );
-      
-      const smsPromises = users.sms.map(user => {
-        const message = `${getSeverityEmoji(alert.severity)} ${event.name}: ${alert.title}${alert.location ? ` at ${alert.location}` : ''}`;
-        
-        return twilio.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: user.alertPreferences.sms.phoneNumber
-        });
-      });
-      
-      await Promise.all(smsPromises);
+    // Get Twilio client
+    const twilioClient = initTwilioClient();
+    
+    if (!twilioClient) {
+      logger.warn('SMS notifications skipped: Twilio client not initialized');
+      return false;
     }
+    
+    const smsPromises = users.sms.map(user => {
+      const message = `${getSeverityEmoji(alert.severity)} ${event.name}: ${alert.title}${alert.location ? ` at ${alert.location}` : ''}`;
+      
+      return twilioClient.messages.create({
+        body: message,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: user.alertPreferences.sms.phoneNumber
+      });
+    });
+    
+    const results = await Promise.all(smsPromises);
+    
+    // Log SMS results
+    results.forEach((result, index) => {
+      logger.info(`SMS sent to ${users.sms[index].name}: ${result.sid}`);
+    });
     
     return true;
   } catch (error) {

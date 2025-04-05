@@ -41,6 +41,7 @@
         "rate-limit-mongo": "^2.3.2",
         "socket.io": "^4.7.2",
         "stopwords": "^0.0.9",
+        "twilio": "^5.5.1",
         "twitter-api-v2": "^1.15.1",
         "winston": "^3.10.0"
     },

@@ -20,11 +20,10 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   const location = useLocation();
   const [hoveredItem, setHoveredItem] = useState(null);
   
-  // Decide how to style active vs. inactive links
   const isActive = (path) => {
     return location.pathname === path
-      ? 'bg-[#C53070] text-white'                  // full pink highlight
-      : 'text-gray-300 hover:bg-[#9D174D]/20 hover:text-white'; // dark hover
+      ? 'bg-[#C53070] text-white'                  
+      : 'text-gray-300 hover:bg-[#9D174D]/20 hover:text-white'; 
   };
 
   const menuItems = [
