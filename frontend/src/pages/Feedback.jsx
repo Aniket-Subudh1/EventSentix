@@ -8,8 +8,8 @@ import { Loader } from '../components/common/Loader';
 import FeedbackTable from '../components/tables/FeedbackTable';
 import FeedbackForm from '../components/forms/FeedbackForm';
 import feedbackService from '../services/feedbackService';
+import twitterService from '../services/twitterService'; // Fixed import path
 import debounce from 'lodash/debounce';
-
 import { 
   MessageCircle, 
   Filter, 
@@ -20,7 +20,8 @@ import {
   Smile, 
   Meh, 
   Frown, 
-  Calendar 
+  Calendar,
+  Twitter
 } from 'react-feather';
 
 const Feedback = () => {
@@ -36,6 +37,7 @@ const Feedback = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState([]);
   const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
+  const [isSearchingTwitter, setIsSearchingTwitter] = useState(false);
   const [batchAction, setBatchAction] = useState({
     processed: true,
     issueType: '',
@@ -72,11 +74,11 @@ const Feedback = () => {
         });
         
         setFeedback(response.data);
-        setPagination({
-          ...pagination,
+        setPagination((prev) => ({
+          ...prev,
           total: response.total,
           totalPages: response.pagination.totalPages
-        });
+        }));
       } catch (err) {
         console.error('Error fetching feedback:', err);
         setError('Failed to load feedback data');
@@ -103,6 +105,42 @@ const Feedback = () => {
     }
   }, [newFeedback, selectedEvent]);
   
+  const handleTwitterSearch = async () => {
+    if (!selectedEvent?._id) {
+      setError('No event selected for Twitter search');
+      return;
+    }
+
+    const eventId = selectedEvent._id;
+    const hashtag = selectedEvent.socialTracking?.hashtags?.[0] || '';
+
+    if (!hashtag) {
+      setError('No hashtags configured for this event');
+      return;
+    }
+
+    try {
+      setIsSearchingTwitter(true);
+      setError(null);
+
+      console.log('Initiating Twitter search for:', { eventId, hashtag });
+      const response = await twitterService.searchTweets(eventId, hashtag);
+      console.log('Twitter search response:', response);
+
+      // Refresh feedback list after search
+      debouncedFetchFeedback(eventId, pagination.page, filters);
+
+      console.log(response.totalPosts > 0 
+        ? `Found ${response.totalPosts} new tweets`
+        : 'No new tweets found');
+    } catch (err) {
+      console.error('Twitter search error:', err);
+      setError('Failed to search Twitter: ' + (err.message || 'Unknown error'));
+    } finally {
+      setIsSearchingTwitter(false);
+    }
+  };
+
   const handleViewFeedback = (feedbackItem) => {
     setViewFeedback(feedbackItem);
     setIsModalOpen(true);
@@ -194,6 +232,7 @@ const Feedback = () => {
     }
   };
 
+  // Rest of the JSX remains unchanged
   return (
     <div className="p-6 bg-[#00001A] min-h-screen">
       <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl">
@@ -212,7 +251,7 @@ const Feedback = () => {
             )}
           </div>
           
-          <div className="flex space-x-2">
+          {/* <div className="flex space-x-2">
             <Button
               variant="primary"
               onClick={() => setIsFeedbackFormOpen(true)}
@@ -230,7 +269,23 @@ const Feedback = () => {
             >
               Refresh
             </Button>
-          </div>
+          </div> */}
+          <Button
+            variant="primary"
+            onClick={handleTwitterSearch}
+            icon={<Twitter size={16} />}
+            disabled={isSearchingTwitter || !selectedEvent}
+          >
+            {isSearchingTwitter ? 'Searching...' : 'Search Twitter'}
+          </Button>
+          
+          <Button
+            variant="primary"
+            onClick={() => selectedEvent && selectedEvent._id ? debouncedFetchFeedback(selectedEvent._id, pagination.page, filters) : setError('No event selected')}
+            icon={<RefreshCw size={16} />}
+          >
+            Refresh
+          </Button>
         </div>
         {loading && feedback.length > 0 && <div className="mt-2 text-sm text-gray-400 animate-pulse">Refreshing data...</div>}
       </div>

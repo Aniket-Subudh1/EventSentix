@@ -145,7 +145,7 @@ exports.stopTwitterStream = asyncHandler(async (req, res) => {
 
 
 exports.searchTwitter = asyncHandler(async (req, res) => {
-  const { eventId } = req.body;
+  const { eventId, hashtag } = req.body;
   
   if (!eventId) {
     return res.status(400).json({ success: false, message: 'Event ID is required' });
@@ -156,25 +156,20 @@ exports.searchTwitter = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: 'Event not found' });
   }
   
-  // Uncomment this check in production - we're temporarily skipping authorization check for testing
-  // if (req.user.role !== 'admin' && event.owner.toString() !== req.user.id && !event.organizers.map(org => org.toString()).includes(req.user.id)) {
-  //   return res.status(403).json({ success: false, message: 'Not authorized' });
-  // }
-
-  
   try {
-    const searchResults = await twitterService.searchTweets(eventId);
+    const searchResults = await twitterService.searchTweets(eventId, hashtag || event.socialTracking.hashtags[0]);
+    
     res.status(200).json({ 
       success: true, 
-      data: { 
-        results: searchResults.results, 
-        summary: searchResults.summary, 
-        meta: searchResults.meta 
-      } 
+      data: searchResults
     });
   } catch (error) {
     logger.error(`Twitter search error: ${error.message}`, { error });
-    res.status(500).json({ success: false, message: 'Error searching Twitter', error: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error searching Twitter', 
+      error: error.message 
+    });
   }
 });
 

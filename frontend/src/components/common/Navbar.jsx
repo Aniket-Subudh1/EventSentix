@@ -55,7 +55,7 @@ export const Navbar = ({ toggleSidebar }) => {
   }, []);
   
   return (
-    <nav id="navbar" className="bg-[#00001A] border-b border-[#3D3D3D] px-4 py-3 flex justify-between items-center shadow-xl transform transition-all duration-300 hover:shadow-2xl">
+    <nav id="navbar" className="bg-[#00001A] border-b border-[#3D3D3D] px-4 py-3 flex justify-between items-center shadow-xl transform transition-all z-50 duration-300 hover:shadow-2xl">
       <div className="flex items-center">
         <button
           onClick={toggleSidebar}
