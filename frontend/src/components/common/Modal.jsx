@@ -7,7 +7,8 @@ export const Modal = ({
   title, 
   children, 
   size = 'md',
-  footer
+  footer,
+  className = ''
 }) => {
   const modalRef = useRef(null);
   
@@ -47,7 +48,7 @@ export const Modal = ({
   
   if (!isOpen) return null;
   
-  // Size styles
+  // Size classes
   const sizeClasses = {
     sm: 'max-w-md',
     md: 'max-w-lg',
@@ -59,31 +60,32 @@ export const Modal = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
+        {/* Overlay */}
         <div className="fixed inset-0 transition-opacity">
           <div className="absolute inset-0 bg-black opacity-50"></div>
         </div>
         
         <div 
-          className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle ${sizeClasses[size] || sizeClasses.md} w-full`}
+          className={`inline-block align-bottom bg-[#00001A] rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle ${sizeClasses[size] || sizeClasses.md} w-full ${className}`}
           ref={modalRef}
         >
-          <div className="bg-white">
-            <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-lg font-semibold">{title}</h3>
+          <div className="bg-[#00001A]">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-[#9D174D]/50">
+              <h3 className="text-lg font-semibold text-white">{title}</h3>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                className="text-gray-400 hover:text-gray-200 focus:outline-none"
               >
                 <X size={20} />
               </button>
             </div>
             
-            <div className="px-6 py-4">
+            <div className="px-6 py-4 text-white">
               {children}
             </div>
             
             {footer && (
-              <div className="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-2">
+              <div className="px-6 py-4 bg-[#00001A] border-t border-[#9D174D]/50 flex justify-end space-x-2">
                 {footer}
               </div>
             )}

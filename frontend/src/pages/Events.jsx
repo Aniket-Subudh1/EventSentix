@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import { EventContext } from '../context/EventContext';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
@@ -7,6 +7,7 @@ import { Loader } from '../components/common/Loader';
 import { Calendar, MapPin, Clock, Edit, Trash2, Power, ZapOff } from 'react-feather';
 import { QRCodeCanvas } from 'qrcode.react';
 
+// EventForm Component
 const EventForm = ({ event, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -237,6 +238,7 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
   );
 };
 
+// EventCard Component with increased QR size and Download option
 const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelect, isSelected }) => {
   const startDate = new Date(event.startDate);
   const endDate = new Date(event.endDate);
@@ -262,6 +264,21 @@ const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelec
     timeStatusClass = 'text-gray-400';
   }
   
+  // Ref for QRCodeCanvas for download
+  const qrRef = useRef(null);
+  
+  const handleDownloadQR = () => {
+    if (qrRef.current) {
+      const url = qrRef.current.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `event-${event._id}-qr.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+  
   return (
     <Card className={`bg-white/5 backdrop-blur-lg rounded-xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:rotate-1 border ${isSelected ? 'border-[#C53070]' : 'border-[#3D3D3D]'}`}>
       <div className="p-5">
@@ -275,14 +292,23 @@ const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelec
         </div>
         
         {event._id && (
-          <div className="mt-4 transform transition-all duration-300 hover:scale-110">
+          <div className="mt-4 transform transition-all duration-300 hover:scale-110 space-y-2">
             <QRCodeCanvas
+              ref={qrRef}
               value={`${window.location.origin}/event/${event._id}/engage`}
-              size={96}
+              size={150}
               level="H"
               includeMargin={true}
               className="rounded-lg shadow-md border border-[#3D3D3D]"
             />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadQR}
+              className="bg-white/5 border border-[#3D3D3D] text-white hover:bg-[#9D174D]/20 transition-all duration-300 transform hover:scale-105"
+            >
+              Download QR Code
+            </Button>
           </div>
         )}
 
