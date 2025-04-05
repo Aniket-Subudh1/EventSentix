@@ -8,12 +8,13 @@ const FeedbackSchema = new mongoose.Schema({
   },
   source: {
     type: String,
-    enum: ['twitter', 'instagram', 'linkedin', 'manual', 'survey'],
+    enum: ['direct', 'twitter', 'instagram', 'linkedin', 'manual', 'survey'],
+    default: 'direct',
     required: true
   },
   sourceId: {
     type: String,
-    required: false
+    default: null
   },
   text: {
     type: String,
@@ -21,6 +22,11 @@ const FeedbackSchema = new mongoose.Schema({
     maxlength: [2000, 'Text cannot be more than 2000 characters']
   },
   sentiment: {
+    type: String,
+    enum: ['positive', 'neutral', 'negative'],
+    required: true
+  },
+  sentimentScore: {
     type: Number,
     min: -1,
     max: 1,
@@ -30,14 +36,32 @@ const FeedbackSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     default: {}
   },
+  issueType: {
+    type: String,
+    default: null
+  },
+  issueDetails: {
+    location: { type: String, default: null },
+    resolved: { type: Boolean, default: false },
+    severity: {
+      type: String,
+      enum: ['low', 'medium', 'high', 'critical'],
+      default: 'low'
+    }
+  },
+  processed: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-// Create a compound index to prevent duplicate entries from the same source
-FeedbackSchema.index({ event: 1, source: 1, sourceId: 1 }, { unique: true, sparse: true });
+FeedbackSchema.index(
+  { event: 1, source: 1, sourceId: 1 },
+  { unique: true, sparse: true }
+);
 
 module.exports = mongoose.model('Feedback', FeedbackSchema);
-

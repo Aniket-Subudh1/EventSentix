@@ -20,6 +20,7 @@ import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 import EngagementLanding from './pages/EngagementLanding';
 import Chat from './pages/Chat';
+import SubmitFeedback from './pages/SubmitFeedback';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }) => {
@@ -59,6 +60,7 @@ function App() {
       <Routes>
         <Route path="/event/:eventId/engage" element={<EngagementLanding />} />
         <Route path="/chat/:eventId" element={<Chat />} />
+        <Route path="/submit-feedback/:eventId" element={<SubmitFeedback />} />
         <Route
           path="*"
           element={
