@@ -195,45 +195,62 @@ const Feedback = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Feedback</h1>
-        
-        <div className="flex space-x-2">
-          <Button
-            variant="secondary"
-            onClick={() => setIsFeedbackFormOpen(true)}
-            icon={<MessageCircle size={16} />}
-          >
-            Add Feedback
-          </Button>
+    <div className="p-6 bg-[#00001A] min-h-screen">
+      <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold mb-2 text-white bg-gradient-to-r from-[#9D174D] to-[#C53070] bg-clip-text text-transparent">
+              Feedback Management
+            </h1>
+            {selectedEvent && (
+              <div className="flex items-center text-gray-300">
+                <Calendar size={16} className="mr-2 text-[#9D174D]" />
+                {selectedEvent.name} - 
+                {selectedEvent.startDate && new Date(selectedEvent.startDate).toLocaleDateString()} to
+                {selectedEvent.endDate && new Date(selectedEvent.endDate).toLocaleDateString()}
+              </div>
+            )}
+          </div>
           
-          <Button
-            variant="primary"
-            onClick={() => selectedEvent && selectedEvent._id ? debouncedFetchFeedback(selectedEvent._id, pagination.page, filters) : setError('No event selected')}
-            icon={<RefreshCw size={16} />}
-          >
-            Refresh
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              variant="primary"
+              onClick={() => setIsFeedbackFormOpen(true)}
+              className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
+              icon={<MessageCircle size={16} className="mr-2 text-[#9D174D]" />}
+            >
+              Add Feedback
+            </Button>
+            
+            <Button
+              variant="primary"
+              onClick={() => selectedEvent && selectedEvent._id ? debouncedFetchFeedback(selectedEvent._id, pagination.page, filters) : setError('No event selected')}
+              className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
+              icon={<RefreshCw size={16} className="mr-2 text-[#9D174D]" />}
+            >
+              Refresh
+            </Button>
+          </div>
         </div>
+        {loading && feedback.length > 0 && <div className="mt-2 text-sm text-gray-400 animate-pulse">Refreshing data...</div>}
       </div>
       
       {error && (
-        <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-700">
+        <div className="mb-6 rounded-xl bg-red-900/20 p-4 text-red-300 animate-fade-in">
           {error}
         </div>
       )}
       
       {!selectedEvent ? (
-        <div className="flex h-64 flex-col items-center justify-center p-6">
-          <MessageCircle size={48} className="mb-4 text-gray-400" />
-          <h3 className="text-lg font-medium text-gray-900">No event selected</h3>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="flex h-96 flex-col items-center justify-center p-6 bg-[#00001A] rounded-xl animate-fade-in">
+          <MessageCircle size={48} className="mb-4 text-[#9D174D]" />
+          <h3 className="text-lg font-medium text-white">No event selected</h3>
+          <p className="mt-1 text-sm text-gray-400">
             Please select an event to view feedback.
           </p>
           <Button
             variant="primary"
-            className="mt-4"
+            className="mt-4 bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
             onClick={() => window.location.href = '/events'}
           >
             Go to Events
@@ -241,11 +258,11 @@ const Feedback = () => {
         </div>
       ) : (
         <>
-          <Card className="mb-6">
+          <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center mb-4 sm:mb-0">
-                <Filter size={18} className="mr-2 text-gray-600" />
-                <h2 className="text-lg font-medium">Filters</h2>
+                <Filter size={18} className="mr-2 text-[#9D174D]" />
+                <h2 className="text-lg font-medium text-white">Filters</h2>
               </div>
               
               <div className="flex space-x-2">
@@ -254,6 +271,7 @@ const Feedback = () => {
                     variant="secondary"
                     size="sm"
                     onClick={clearFilters}
+                    className="bg-[#00001A] hover:bg-[#9D174D]/20 text-white transition-all duration-300 transform hover:scale-105 hover:rotate-2"
                   >
                     Clear Filters
                   </Button>
@@ -263,7 +281,8 @@ const Feedback = () => {
                   variant="primary"
                   size="sm"
                   onClick={exportFeedback}
-                  icon={<Download size={14} />}
+                  className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
+                  icon={<Download size={14} className="mr-2 text-[#9D174D]" />}
                 >
                   Export
                 </Button>
@@ -272,13 +291,13 @@ const Feedback = () => {
             
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label htmlFor="sentiment" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="sentiment" className="block text-sm font-medium text-gray-300 mb-1">
                   Sentiment
                 </label>
                 <select
                   id="sentiment"
                   name="sentiment"
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="block w-full rounded-md bg-white/5 border-gray-600 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   value={filters.sentiment}
                   onChange={handleFilterChange}
                 >
@@ -290,13 +309,13 @@ const Feedback = () => {
               </div>
               
               <div>
-                <label htmlFor="source" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="source" className="block text-sm font-medium text-gray-300 mb-1">
                   Source
                 </label>
                 <select
                   id="source"
                   name="source"
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="block w-full rounded-md bg-white/5 border-gray-600 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   value={filters.source}
                   onChange={handleFilterChange}
                 >
@@ -311,13 +330,13 @@ const Feedback = () => {
               </div>
               
               <div>
-                <label htmlFor="issueType" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="issueType" className="block text-sm font-medium text-gray-300 mb-1">
                   Issue Type
                 </label>
                 <select
                   id="issueType"
                   name="issueType"
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="block w-full rounded-md bg-white/5 border-gray-600 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   value={filters.issueType}
                   onChange={handleFilterChange}
                 >
@@ -335,14 +354,14 @@ const Feedback = () => {
               </div>
               
               <div>
-                <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-1">
                   Search
                 </label>
                 <input
                   type="text"
                   id="search"
                   name="search"
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="block w-full rounded-md bg-white/5 border-gray-600 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   placeholder="Search feedback..."
                   value={filters.search}
                   onChange={handleFilterChange}
@@ -352,18 +371,18 @@ const Feedback = () => {
             
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="startDate" className="block text-sm font-medium text-gray-300 mb-1">
                   Start Date
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Calendar className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <Calendar className="h-5 w-5 text-[#9D174D]" aria-hidden="true" />
                   </div>
                   <input
                     type="date"
                     id="startDate"
                     name="startDate"
-                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                    className="focus:ring-[#9D174D] focus:border-[#9D174D] block w-full pl-10 sm:text-sm bg-white/5 border-gray-600 text-white rounded-md"
                     value={filters.startDate}
                     onChange={handleFilterChange}
                   />
@@ -371,31 +390,31 @@ const Feedback = () => {
               </div>
               
               <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="endDate" className="block text-sm font-medium text-gray-300 mb-1">
                   End Date
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Calendar className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <Calendar className="h-5 w-5 text-[#9D174D]" aria-hidden="true" />
                   </div>
                   <input
                     type="date"
                     id="endDate"
                     name="endDate"
-                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                    className="focus:ring-[#9D174D] focus:border-[#9D174D] block w-full pl-10 sm:text-sm bg-white/5 border-gray-600 text-white rounded-md"
                     value={filters.endDate}
                     onChange={handleFilterChange}
                   />
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
 
           {selectedFeedback.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6 flex items-center justify-between">
+            <div className="bg-[#9D174D]/20 border border-[#9D174D]/50 rounded-xl p-4 mb-6 flex items-center justify-between animate-fade-in">
               <div className="flex items-center">
-                <CheckSquare className="h-5 w-5 text-blue-500 mr-2" />
-                <span className="text-sm font-medium text-blue-700">
+                <CheckSquare className="h-5 w-5 text-[#9D174D] mr-2" />
+                <span className="text-sm font-medium text-white">
                   {selectedFeedback.length} items selected
                 </span>
               </div>
@@ -405,6 +424,7 @@ const Feedback = () => {
                   variant="secondary"
                   size="sm"
                   onClick={() => setSelectedFeedback([])}
+                  className="bg-[#00001A] hover:bg-[#9D174D]/20 text-white transition-all duration-300 transform hover:scale-105 hover:rotate-2"
                 >
                   Clear Selection
                 </Button>
@@ -413,6 +433,7 @@ const Feedback = () => {
                   variant="primary"
                   size="sm"
                   onClick={() => setIsBatchModalOpen(true)}
+                  className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
                 >
                   Batch Process
                 </Button>
@@ -420,15 +441,15 @@ const Feedback = () => {
             </div>
           )}
           
-          <Card className="mb-6">
+          <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl">
             {loading ? (
               <div className="flex justify-center items-center h-64">
-                <Loader size="lg" />
+                <Loader size="lg" className="text-[#9D174D] animate-spin" />
               </div>
             ) : feedback.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64">
-                <MessageCircle size={48} className="text-gray-300 mb-4" />
-                <p className="text-gray-500 text-lg">No feedback found</p>
+                <MessageCircle size={48} className="text-[#9D174D] mb-4" />
+                <p className="text-white text-lg">No feedback found</p>
                 <p className="text-gray-400 text-sm mt-2">
                   Try adjusting your filters or adding new feedback
                 </p>
@@ -446,10 +467,10 @@ const Feedback = () => {
                   setSelectedFeedback={setSelectedFeedback}
                 />
                 
-                <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6 mt-4">
+                <div className="flex items-center justify-between border-t border-gray-600 px-4 py-3 sm:px-6 mt-4">
                   <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-sm text-gray-700">
+                      <p className="text-sm text-gray-300">
                         Showing <span className="font-medium">{feedback.length}</span> of{' '}
                         <span className="font-medium">{pagination.total}</span> results
                       </p>
@@ -459,7 +480,7 @@ const Feedback = () => {
                         <button
                           onClick={() => handlePageChange(pagination.page - 1)}
                           disabled={pagination.page === 1}
-                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-600 bg-white/5 text-sm font-medium text-gray-300 hover:bg-[#9D174D]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <span className="sr-only">Previous</span>
                           <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -473,8 +494,8 @@ const Feedback = () => {
                             onClick={() => handlePageChange(page + 1)}
                             className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                               pagination.page === page + 1
-                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                ? 'z-10 bg-[#9D174D] border-[#9D174D] text-white'
+                                : 'bg-white/5 border-gray-600 text-gray-300 hover:bg-[#9D174D]/20'
                             }`}
                           >
                             {page + 1}
@@ -484,7 +505,7 @@ const Feedback = () => {
                         <button
                           onClick={() => handlePageChange(pagination.page + 1)}
                           disabled={pagination.page === pagination.totalPages}
-                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-600 bg-white/5 text-sm font-medium text-gray-300 hover:bg-[#9D174D]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <span className="sr-only">Next</span>
                           <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -497,62 +518,63 @@ const Feedback = () => {
                 </div>
               </>
             )}
-          </Card>
+          </div>
 
           <Modal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             title="Feedback Details"
+            className="bg-[#00001A] border border-[#9D174D]/50"
           >
             {viewFeedback && (
-              <div className="space-y-4">
+              <div className="space-y-4 text-white">
                 <div className="flex items-center space-x-2">
                   {viewFeedback.sentiment === 'positive' ? (
-                    <Smile className="text-green-500" size={20} />
+                    <Smile className="text-green-400" size={20} />
                   ) : viewFeedback.sentiment === 'negative' ? (
-                    <Frown className="text-red-500" size={20} />
+                    <Frown className="text-red-400" size={20} />
                   ) : (
-                    <Meh className="text-gray-500" size={20} />
+                    <Meh className="text-yellow-400" size={20} />
                   )}
                   <span className="font-medium capitalize">{viewFeedback.sentiment}</span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-400">
                     (Score: {viewFeedback.sentimentScore.toFixed(2)})
                   </span>
                 </div>
                 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700">Feedback</h3>
-                  <p className="mt-1 text-gray-900">{viewFeedback.text}</p>
+                  <h3 className="text-sm font-medium text-gray-300">Feedback</h3>
+                  <p className="mt-1 text-white">{viewFeedback.text}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700">Source</h3>
-                    <p className="mt-1 capitalize">{viewFeedback.source}</p>
+                    <h3 className="text-sm font-medium text-gray-300">Source</h3>
+                    <p className="mt-1 capitalize text-white">{viewFeedback.source}</p>
                     {viewFeedback.metadata?.username && (
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-400">
                         By: {viewFeedback.metadata.username}
                       </p>
                     )}
                   </div>
                   
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700">Date & Time</h3>
-                    <p className="mt-1">
+                    <h3 className="text-sm font-medium text-gray-300">Date & Time</h3>
+                    <p className="mt-1 text-white">
                       {new Date(viewFeedback.createdAt).toLocaleString()}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700">Issue Type</h3>
-                    <p className="mt-1 capitalize">
+                    <h3 className="text-sm font-medium text-gray-300">Issue Type</h3>
+                    <p className="mt-1 capitalize text-white">
                       {viewFeedback.issueType || 'Not classified'}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700">Location</h3>
-                    <p className="mt-1">
+                    <h3 className="text-sm font-medium text-gray-300">Location</h3>
+                    <p className="mt-1 text-white">
                       {viewFeedback.issueDetails?.location || 'Not specified'}
                     </p>
                   </div>
@@ -560,12 +582,12 @@ const Feedback = () => {
                 
                 {viewFeedback.metadata?.keywords?.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700">Keywords</h3>
+                    <h3 className="text-sm font-medium text-gray-300">Keywords</h3>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {viewFeedback.metadata.keywords.map((keyword, index) => (
                         <span 
                           key={index}
-                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#9D174D]/20 text-white"
                         >
                           {keyword}
                         </span>
@@ -581,11 +603,13 @@ const Feedback = () => {
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
             title="Delete Feedback"
+            className="bg-[#00001A] border border-[#9D174D]/50"
             footer={
               <>
                 <Button
                   variant="secondary"
                   onClick={() => setIsDeleteModalOpen(false)}
+                  className="bg-[#00001A] hover:bg-[#9D174D]/20 text-white transition-all duration-300 transform hover:scale-105 hover:rotate-2"
                 >
                   Cancel
                 </Button>
@@ -593,17 +617,18 @@ const Feedback = () => {
                 <Button
                   variant="danger"
                   onClick={() => handleDeleteFeedback(viewFeedback?._id)}
-                  icon={<Trash2 size={16} />}
+                  className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
+                  icon={<Trash2 size={16} className="mr-2 text-[#9D174D]" />}
                 >
                   Delete
                 </Button>
               </>
             }
           >
-            <p className="text-gray-700">
+            <p className="text-white">
               Are you sure you want to delete this feedback?
             </p>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-gray-400">
               This action cannot be undone.
             </p>
           </Modal>
@@ -612,11 +637,13 @@ const Feedback = () => {
             isOpen={isBatchModalOpen}
             onClose={() => setIsBatchModalOpen(false)}
             title="Batch Process Feedback"
+            className="bg-[#00001A] border border-[#9D174D]/50"
             footer={
               <>
                 <Button
                   variant="secondary"
                   onClick={() => setIsBatchModalOpen(false)}
+                  className="bg-[#00001A] hover:bg-[#9D174D]/20 text-white transition-all duration-300 transform hover:scale-105 hover:rotate-2"
                 >
                   Cancel
                 </Button>
@@ -624,25 +651,26 @@ const Feedback = () => {
                 <Button
                   variant="primary"
                   onClick={handleBatchProcess}
-                  icon={<CheckSquare size={16} />}
+                  className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:rotate-2"
+                  icon={<CheckSquare size={16} className="mr-2 text-[#9D174D]" />}
                 >
                   Process {selectedFeedback.length} Items
                 </Button>
               </>
             }
           >
-            <div className="space-y-4">
-              <p className="text-gray-700">
+            <div className="space-y-4 text-white">
+              <p>
                 Apply the following updates to {selectedFeedback.length} selected feedback items:
               </p>
               
               <div>
-                <label htmlFor="batch-issueType" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="batch-issueType" className="block text-sm font-medium text-gray-300">
                   Issue Type
                 </label>
                 <select
                   id="batch-issueType"
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base bg-white/5 border-gray-600 text-white focus:outline-none focus:ring-[#9D174D] focus:border-[#9D174D] sm:text-sm rounded-md"
                   value={batchAction.issueType}
                   onChange={(e) => setBatchAction({...batchAction, issueType: e.target.value})}
                 >
@@ -664,11 +692,11 @@ const Feedback = () => {
                   id="batch-processed"
                   name="processed"
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-[#9D174D] focus:ring-[#9D174D] border-gray-600 rounded bg-white/5"
                   checked={batchAction.processed}
                   onChange={(e) => setBatchAction({...batchAction, processed: e.target.checked})}
                 />
-                <label htmlFor="batch-processed" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="batch-processed" className="ml-2 block text-sm text-white">
                   Mark as processed
                 </label>
               </div>
@@ -678,11 +706,11 @@ const Feedback = () => {
                   id="batch-resolved"
                   name="resolved"
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-[#9D174D] focus:ring-[#9D174D] border-gray-600 rounded bg-white/5"
                   checked={batchAction.resolved}
                   onChange={(e) => setBatchAction({...batchAction, resolved: e.target.checked})}
                 />
-                <label htmlFor="batch-resolved" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="batch-resolved" className="ml-2 block text-sm text-white">
                   Mark issues as resolved
                 </label>
               </div>
@@ -693,6 +721,7 @@ const Feedback = () => {
             isOpen={isFeedbackFormOpen}
             onClose={() => setIsFeedbackFormOpen(false)}
             title="Add Feedback"
+            className="bg-[#00001A] border border-[#9D174D]/50"
           >
             <FeedbackForm
               onSuccess={() => {

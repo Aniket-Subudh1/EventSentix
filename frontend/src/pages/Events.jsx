@@ -7,7 +7,6 @@ import { Loader } from '../components/common/Loader';
 import { Calendar, MapPin, Clock, Edit, Trash2, Power, ZapOff } from 'react-feather';
 import { QRCodeCanvas } from 'qrcode.react';
 
-
 const EventForm = ({ event, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -26,7 +25,6 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
   
   useEffect(() => {
     if (event) {
-      // Format dates for input
       const startDate = new Date(event.startDate);
       const endDate = new Date(event.endDate);
       
@@ -100,23 +98,21 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
   };
   
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
+        <div className="mb-4 rounded-xl bg-red-900/20 p-4 text-sm text-red-300 animate-fade-in border border-red-700">
           {error}
         </div>
       )}
       
       <div className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Event Name
-          </label>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-300">Event Name</label>
           <input
             type="text"
             id="name"
             name="name"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-xl bg-[#00001A] border-[#3D3D3D] text-white shadow-sm focus:border-[#C53070] focus:ring-[#C53070] transition-all duration-300"
             value={formData.name}
             onChange={handleChange}
             required
@@ -124,14 +120,12 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
         </div>
         
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Description
-          </label>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-300">Description</label>
           <textarea
             id="description"
             name="description"
             rows="3"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-xl bg-[#00001A] border-[#3D3D3D] text-white shadow-sm focus:border-[#C53070] focus:ring-[#C53070] transition-all duration-300"
             value={formData.description}
             onChange={handleChange}
             required
@@ -139,14 +133,12 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
         </div>
         
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-            Location
-          </label>
+          <label htmlFor="location" className="block text-sm font-medium text-gray-300">Location</label>
           <input
             type="text"
             id="location"
             name="location"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-xl bg-[#00001A] border-[#3D3D3D] text-white shadow-sm focus:border-[#C53070] focus:ring-[#C53070] transition-all duration-300"
             value={formData.location}
             onChange={handleChange}
             required
@@ -155,14 +147,12 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
         
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-              Start Date
-            </label>
+            <label htmlFor="startDate" className="block text-sm font-medium text-gray-300">Start Date</label>
             <input
               type="date"
               id="startDate"
               name="startDate"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-xl bg-[#00001A] border-[#3D3D3D] text-white shadow-sm focus:border-[#C53070] focus:ring-[#C53070] transition-all duration-300"
               value={formData.startDate}
               onChange={handleChange}
               required
@@ -170,14 +160,12 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
           </div>
           
           <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-              End Date
-            </label>
+            <label htmlFor="endDate" className="block text-sm font-medium text-gray-300">End Date</label>
             <input
               type="date"
               id="endDate"
               name="endDate"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-xl bg-[#00001A] border-[#3D3D3D] text-white shadow-sm focus:border-[#C53070] focus:ring-[#C53070] transition-all duration-300"
               value={formData.endDate}
               onChange={handleChange}
               required
@@ -186,13 +174,11 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Hashtags
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Hashtags</label>
           <div className="flex">
             <input
               type="text"
-              className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md rounded-r-none"
+              className="focus:ring-[#C53070] focus:border-[#C53070] block w-full sm:text-sm bg-[#00001A] border-[#3D3D3D] text-white rounded-xl rounded-r-none transition-all duration-300"
               placeholder="Add hashtag (e.g., #EventName)"
               value={hashtagInput}
               onChange={(e) => setHashtagInput(e.target.value)}
@@ -200,7 +186,7 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
             />
             <button
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-[#C53070] text-sm font-medium rounded-r-xl text-white bg-[#9D174D] hover:bg-[#C53070] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C53070] transition-all duration-300 transform hover:scale-105 hover:rotate-1"
               onClick={addHashtag}
             >
               Add
@@ -211,16 +197,15 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
             {formData.socialTracking.hashtags.map((tag, index) => (
               <span 
                 key={index}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#9D174D]/20 text-[#C53070] transform transition-all duration-200 hover:scale-110 animate-fade-in border border-[#C53070]"
               >
                 {tag}
                 <button
                   type="button"
-                  className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-500"
+                  className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full text-[#C53070] hover:bg-[#9D174D] hover:text-white transition-all duration-200"
                   onClick={() => removeHashtag(tag)}
                 >
-                  <span className="sr-only">Remove</span>
-                  &times;
+                  ×
                 </button>
               </span>
             ))}
@@ -233,6 +218,7 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
           type="button"
           variant="secondary"
           onClick={onCancel}
+          className="bg-[#00001A] hover:bg-[#3D3D3D] text-white transition-all duration-300 transform hover:scale-105 hover:rotate-1 border border-[#3D3D3D]"
         >
           Cancel
         </Button>
@@ -241,8 +227,9 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
           type="submit"
           variant="primary"
           disabled={loading}
+          className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:rotate-1 border border-[#C53070]"
         >
-          {loading ? <Loader size="sm" color="white" className="mr-2" /> : null}
+          {loading ? <Loader size="sm" color="white" className="mr-2 animate-spin" /> : null}
           {event ? 'Update Event' : 'Create Event'}
         </Button>
       </div>
@@ -254,7 +241,6 @@ const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelec
   const startDate = new Date(event.startDate);
   const endDate = new Date(event.endDate);
   
-  // Calculate days remaining or days passed
   const today = new Date();
   const isUpcoming = startDate > today;
   const isOngoing = startDate <= today && endDate >= today;
@@ -265,64 +251,65 @@ const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelec
   if (isUpcoming) {
     const daysUntil = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
     timeStatus = `Starts in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`;
-    timeStatusClass = 'text-blue-600';
+    timeStatusClass = 'text-[#C53070]';
   } else if (isOngoing) {
     const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
     timeStatus = `${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining`;
-    timeStatusClass = 'text-green-600';
+    timeStatusClass = 'text-green-400';
   } else {
     const daysPassed = Math.ceil((today - endDate) / (1000 * 60 * 60 * 24));
     timeStatus = `Ended ${daysPassed} day${daysPassed !== 1 ? 's' : ''} ago`;
-    timeStatusClass = 'text-gray-500';
+    timeStatusClass = 'text-gray-400';
   }
   
   return (
-    <Card className={`transition-all duration-200 ${isSelected ? 'ring-2 ring-blue-500' : 'hover:shadow-lg'}`}>
-      <div>
-        <div className="flex justify-between">
-          <h3 className="text-lg font-medium">{event.name}</h3>
-          <div className={`px-2 py-1 rounded-full text-xs font-medium ${event.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+    <Card className={`bg-white/5 backdrop-blur-lg rounded-xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:rotate-1 border ${isSelected ? 'border-[#C53070]' : 'border-[#3D3D3D]'}`}>
+      <div className="p-5">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-white bg-gradient-to-r from-[#9D174D] to-[#C53070] bg-clip-text text-transparent">
+            {event.name}
+          </h3>
+          <div className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 border ${event.isActive ? 'bg-green-500/20 text-green-300 border-green-700' : 'bg-red-500/20 text-red-300 border-red-700'}`}>
             {event.isActive ? 'Active' : 'Inactive'}
           </div>
         </div>
-        {event._id && (
-  <div className="mt-4">
-    <QRCodeCanvas
-      value={`${window.location.origin}/event/${event._id}/engage`}
-      size={96}
-      level="H"
-      includeMargin={true}
-    />
-  </div>
-)}
-
-
-        <p className="mt-1 text-sm text-gray-600 line-clamp-2">{event.description}</p>
         
-        <div className="mt-4 space-y-2">
-          <div className="flex items-center text-sm text-gray-500">
-            <Calendar size={16} className="mr-2" />
-            <span>
-              {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
-            </span>
+        {event._id && (
+          <div className="mt-4 transform transition-all duration-300 hover:scale-110">
+            <QRCodeCanvas
+              value={`${window.location.origin}/event/${event._id}/engage`}
+              size={96}
+              level="H"
+              includeMargin={true}
+              className="rounded-lg shadow-md border border-[#3D3D3D]"
+            />
+          </div>
+        )}
+
+        <p className="mt-2 text-sm text-gray-300 line-clamp-2">{event.description}</p>
+        
+        <div className="mt-4 space-y-3 text-sm text-gray-400">
+          <div className="flex items-center">
+            <Calendar size={16} className="mr-2 text-[#C53070]" />
+            <span>{startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}</span>
           </div>
           
-          <div className="flex items-center text-sm text-gray-500">
-            <MapPin size={16} className="mr-2" />
+          <div className="flex items-center">
+            <MapPin size={16} className="mr-2 text-[#C53070]" />
             <span>{event.location}</span>
           </div>
           
-          <div className={`flex items-center text-sm ${timeStatusClass}`}>
+          <div className={`flex items-center ${timeStatusClass}`}>
             <Clock size={16} className="mr-2" />
             <span>{timeStatus}</span>
           </div>
           
           {event.socialTracking?.hashtags && event.socialTracking.hashtags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               {event.socialTracking.hashtags.map((tag, index) => (
                 <span 
                   key={index}
-                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#9D174D]/20 text-[#C53070] transform transition-all duration-200 hover:scale-110 animate-fade-in border border-[#C53070]"
                 >
                   {tag}
                 </span>
@@ -332,11 +319,12 @@ const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelec
         </div>
       </div>
       
-      <div className="mt-5 flex items-center justify-between">
+      <div className="p-5 pt-0 flex items-center justify-between">
         <Button
           variant="primary"
           size="sm"
           onClick={() => onSelect(event)}
+          className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:rotate-1 border border-[#C53070]"
         >
           Select Event
         </Button>
@@ -344,7 +332,7 @@ const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelec
         <div className="flex space-x-2">
           <button
             onClick={() => onToggleActive(event._id)}
-            className="p-1 rounded-full text-gray-400 hover:text-gray-500"
+            className="p-2 rounded-full text-gray-400 hover:text-green-500 hover:bg-green-500/10 transition-all duration-200 transform hover:scale-110 hover:rotate-3 border border-[#3D3D3D]"
             title={event.isActive ? 'Deactivate' : 'Activate'}
           >
             {event.isActive ? <ZapOff size={18} /> : <Power size={18} />}
@@ -352,7 +340,7 @@ const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelec
           
           <button
             onClick={() => onEdit(event)}
-            className="p-1 rounded-full text-gray-400 hover:text-gray-500"
+            className="p-2 rounded-full text-gray-400 hover:text-[#C53070] hover:bg-[#9D174D]/10 transition-all duration-200 transform hover:scale-110 hover:rotate-3 border border-[#3D3D3D]"
             title="Edit"
           >
             <Edit size={18} />
@@ -360,7 +348,7 @@ const EventCard = React.memo(({ event, onEdit, onDelete, onToggleActive, onSelec
           
           <button
             onClick={() => onDelete(event._id)}
-            className="p-1 rounded-full text-gray-400 hover:text-red-500"
+            className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-500/10 transition-all duration-200 transform hover:scale-110 hover:rotate-3 border border-[#3D3D3D]"
             title="Delete"
           >
             <Trash2 size={18} />
@@ -383,6 +371,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, eventName, isDele
             variant="secondary"
             onClick={onClose}
             disabled={isDeleting}
+            className="bg-[#00001A] hover:bg-[#3D3D3D] text-white transition-all duration-300 transform hover:scale-105 hover:rotate-1 border border-[#3D3D3D]"
           >
             Cancel
           </Button>
@@ -391,17 +380,19 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, eventName, isDele
             variant="danger"
             onClick={onConfirm}
             disabled={isDeleting}
+            className="bg-red-600 hover:bg-red-700 text-white transition-all duration-300 transform hover:scale-105 hover:rotate-1 border border-red-700"
           >
-            {isDeleting ? <Loader size="sm" color="white" className="mr-2" /> : null}
+            {isDeleting ? <Loader size="sm" color="white" className="mr-2 animate-spin" /> : null}
             Delete
           </Button>
         </>
       }
+      className="bg-[#00001A] rounded-xl shadow-xl border border-[#3D3D3D] animate-fade-in"
     >
-      <p className="text-gray-700">
-        Are you sure you want to delete event <span className="font-medium">{eventName}</span>?
+      <p className="text-gray-300">
+        Are you sure you want to delete event <span className="font-medium text-white">{eventName}</span>?
       </p>
-      <p className="mt-2 text-sm text-gray-500">
+      <p className="mt-2 text-sm text-gray-400">
         This action cannot be undone. All feedback, alerts, and analytics data for this event will be permanently deleted.
       </p>
     </Modal>
@@ -427,11 +418,9 @@ const Events = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [filter, setFilter] = useState('all'); // 'all', 'active', 'inactive'
+  const [filter, setFilter] = useState('all');
   
-  // Only fetch events on initial component mount
   useEffect(() => {
-    // Only fetch if we don't already have events
     if (events.length === 0 && !loading) {
       fetchEvents();
     }
@@ -482,7 +471,6 @@ const Events = () => {
     setSelectedEvent(event);
   }, [setSelectedEvent]);
   
-  // Filter events based on selected filter
   const filteredEvents = events.filter(event => {
     if (filter === 'all') return true;
     if (filter === 'active') return event.isActive;
@@ -491,65 +479,60 @@ const Events = () => {
   });
   
   return (
-    <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Events</h1>
+    <div className="p-6 bg-[#00001A] min-h-screen">
+      <div className="mb-6 flex items-center justify-between transform transition-all duration-300">
+        <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-[#9D174D] to-[#C53070] bg-clip-text text-transparent animate-fade-in">
+          Events
+        </h1>
         
         <Button
           variant="primary"
           onClick={() => setShowCreateModal(true)}
           icon={<Calendar size={18} className="mr-2" />}
+          className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:rotate-1 hover:shadow-lg border border-[#C53070]"
         >
           Create Event
         </Button>
       </div>
       
       {error && (
-        <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-700">
+        <div className="mb-6 rounded-xl bg-red-900/20 p-4 text-sm text-red-300 animate-fade-in border border-red-700">
           {error}
         </div>
       )}
       
-      <div className="mb-6 flex space-x-2">
-        <Button
-          variant={filter === 'all' ? 'primary' : 'outline'}
-          size="sm"
-          onClick={() => setFilter('all')}
-        >
-          All Events
-        </Button>
-        
-        <Button
-          variant={filter === 'active' ? 'primary' : 'outline'}
-          size="sm"
-          onClick={() => setFilter('active')}
-        >
-          Active
-        </Button>
-        
-        <Button
-          variant={filter === 'inactive' ? 'primary' : 'outline'}
-          size="sm"
-          onClick={() => setFilter('inactive')}
-        >
-          Inactive
-        </Button>
+      <div className="mb-6 flex space-x-3">
+        {['all', 'active', 'inactive'].map((f) => (
+          <Button
+            key={f}
+            variant={filter === f ? 'primary' : 'outline'}
+            size="sm"
+            onClick={() => setFilter(f)}
+            className={`${
+              filter === f 
+                ? 'bg-[#9D174D] text-white border-[#C53070]' 
+                : 'bg-white/5 text-gray-300 hover:bg-[#3D3D3D] border-[#3D3D3D]'
+            } transition-all duration-300 transform hover:scale-105 hover:rotate-1 border`}
+          >
+            {f.charAt(0).toUpperCase() + f.slice(1)}
+          </Button>
+        ))}
       </div>
       
       {loading ? (
         <div className="flex h-64 items-center justify-center">
-          <Loader size="lg" />
+          <Loader size="lg" className="text-[#C53070] animate-spin" />
         </div>
       ) : filteredEvents.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+        <div className="flex h-64 flex-col items-center justify-center rounded-xl bg-white/5 backdrop-blur-lg border border-[#3D3D3D] p-6 text-center transform transition-all duration-300 hover:shadow-xl hover:rotate-1 animate-fade-in">
           <Calendar size={48} className="mb-4 text-gray-400" />
-          <h3 className="text-lg font-medium text-gray-900">No events found</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <h3 className="text-lg font-medium text-white">No events found</h3>
+          <p className="mt-1 text-sm text-gray-400">
             Get started by creating a new event.
           </p>
           <Button
             variant="primary"
-            className="mt-4"
+            className="mt-4 bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:rotate-1 border border-[#C53070]"
             onClick={() => setShowCreateModal(true)}
           >
             Create Event
@@ -571,11 +554,11 @@ const Events = () => {
         </div>
       )}
       
-      {/* Create Event Modal */}
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         title="Create Event"
+        className="bg-[#00001A] rounded-xl shadow-xl border border-[#3D3D3D] animate-fade-in"
       >
         <EventForm
           onSubmit={handleCreateSubmit}
@@ -583,11 +566,11 @@ const Events = () => {
         />
       </Modal>
       
-      {/* Edit Event Modal */}
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         title="Edit Event"
+        className="bg-[#00001A] rounded-xl shadow-xl border border-[#3D3D3D] animate-fade-in"
       >
         <EventForm
           event={currentEvent}
@@ -596,7 +579,6 @@ const Events = () => {
         />
       </Modal>
       
-      {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

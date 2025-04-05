@@ -20,6 +20,7 @@
         "react-scripts": "5.0.1",
         "recharts": "^2.4.3",
         "socket.io-client": "^4.6.1",
+        "tailwindcss-animate": "^1.0.7",
         "web-vitals": "^2.1.4"
     },
     "scripts": {

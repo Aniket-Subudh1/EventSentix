@@ -29,7 +29,7 @@ import {
   Info
 } from 'react-feather';
 
-// Utility functions
+// Utility functions (unchanged)
 const getSeverityIcon = (severity) => {
   switch (severity) {
     case 'critical': return <AlertCircle className="text-red-600" />;
@@ -80,7 +80,7 @@ const formatDuration = (start, end) => {
   return `${days} day${days !== 1 ? 's' : ''} ${remainingHours} hr${remainingHours !== 1 ? 's' : ''}`;
 };
 
-// AlertList component
+// AlertList component (unchanged logic, styled)
 const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, selectedIds, onSelectMultiple }) => {
   const isSelected = (id) => selectedIds.includes(id);
   
@@ -102,44 +102,44 @@ const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, select
   
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-gray-700">
+        <thead className="bg-gray-800">
           <tr>
-            <th scope="col" className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               <input
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-[#9D174D] focus:ring-[#9D174D] border-gray-600 rounded bg-gray-900"
                 checked={selectedIds.length > 0 && selectedIds.length === alerts.length}
                 onChange={toggleSelectAll}
               />
             </th>
-            <th scope="col" className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Severity
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Alert
             </th>
-            <th scope="col" className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Type
             </th>
-            <th scope="col" className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Status
             </th>
-            <th scope="col" className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Created
             </th>
-            <th scope="col" className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-gray-900 divide-y divide-gray-700">
           {alerts.map((alert) => (
-            <tr key={alert._id} className={isSelected(alert._id) ? 'bg-blue-50' : ''}>
+            <tr key={alert._id} className={isSelected(alert._id) ? 'bg-[#9D174D]/20' : ''}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-[#9D174D] focus:ring-[#9D174D] border-gray-600 rounded bg-gray-900"
                   checked={isSelected(alert._id)}
                   onChange={() => toggleSelection(alert._id)}
                 />
@@ -150,46 +150,46 @@ const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, select
                 </div>
               </td>
               <td className="px-6 py-4">
-                <div className="text-sm font-medium text-gray-900 line-clamp-1">{alert.title}</div>
-                <div className="text-xs text-gray-500 line-clamp-1">{alert.description}</div>
+                <div className="text-sm font-medium text-white line-clamp-1">{alert.title}</div>
+                <div className="text-xs text-gray-400 line-clamp-1">{alert.description}</div>
                 {alert.location && (
-                  <div className="text-xs text-gray-500 flex items-center mt-1">
+                  <div className="text-xs text-gray-400 flex items-center mt-1">
                     <MapPin size={12} className="mr-1" />
                     {alert.location}
                   </div>
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className="capitalize text-sm text-gray-700">{alert.type}</span>
-                <div className="text-xs text-gray-500 mt-1">{alert.category}</div>
+                <span className="capitalize text-sm text-gray-300">{alert.type}</span>
+                <div className="text-xs text-gray-400 mt-1">{alert.category}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <span className={`px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${getStatusClass(alert.status)}`}>
                   {alert.status}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                 {formatDate(alert.createdAt)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
                   <button
                     onClick={() => onViewDetail(alert)}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-[#9D174D] hover:text-[#C53070]"
                   >
                     View
                   </button>
                   {alert.status !== 'resolved' && (
                     <button
                       onClick={() => onStatusChange(alert._id, 'resolved')}
-                      className="text-green-600 hover:text-green-800"
+                      className="text-green-400 hover:text-green-300"
                     >
                       Resolve
                     </button>
                   )}
                   <button
                     onClick={() => onDelete(alert._id)}
-                    className="text-red-600 hover:text-red-800"
+                    className="text-red-400 hover:text-red-300"
                   >
                     Delete
                   </button>
@@ -203,7 +203,7 @@ const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, select
   );
 });
 
-// AlertFilter component
+// AlertFilter component (unchanged logic, styled)
 const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
   const [localFilters, setLocalFilters] = useState({ ...filters });
   
@@ -241,17 +241,17 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
   }, [localFilters, setFilters, onApplyFilters]);
   
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102">
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <div>
-            <label htmlFor="severity" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="severity" className="block text-sm font-medium text-gray-300">
               Severity
             </label>
             <select
               id="severity"
               name="severity"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               value={localFilters.severity}
               onChange={handleChange}
             >
@@ -264,13 +264,13 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
           </div>
           
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="type" className="block text-sm font-medium text-gray-300">
               Type
             </label>
             <select
               id="type"
               name="type"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               value={localFilters.type}
               onChange={handleChange}
             >
@@ -282,13 +282,13 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
           </div>
           
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="category" className="block text-sm font-medium text-gray-300">
               Category
             </label>
             <select
               id="category"
               name="category"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               value={localFilters.category}
               onChange={handleChange}
             >
@@ -300,13 +300,13 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
           </div>
           
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="status" className="block text-sm font-medium text-gray-300">
               Status
             </label>
             <select
               id="status"
               name="status"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               value={localFilters.status}
               onChange={handleChange}
             >
@@ -320,28 +320,28 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
           </div>
           
           <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="startDate" className="block text-sm font-medium text-gray-300">
               Start Date
             </label>
             <input
               type="date"
               id="startDate"
               name="startDate"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               value={localFilters.startDate}
               onChange={handleChange}
             />
           </div>
           
           <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="search" className="block text-sm font-medium text-gray-300">
               Search
             </label>
             <input
               type="text"
               id="search"
               name="search"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               placeholder="Search alerts..."
               value={localFilters.search}
               onChange={handleChange}
@@ -354,6 +354,7 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
             type="button"
             variant="secondary"
             onClick={handleReset}
+            className="bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105"
           >
             Reset
           </Button>
@@ -362,6 +363,7 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
             type="submit"
             variant="primary"
             icon={<Filter size={16} className="mr-2" />}
+            className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105"
           >
             Apply Filters
           </Button>
@@ -371,7 +373,7 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
   );
 };
 
-// AlertDetailModal component
+// AlertDetailModal component (unchanged logic, styled)
 const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -396,6 +398,7 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
       onClose={onClose}
       title={`Alert: ${alert.title}`}
       size="lg"
+      className="bg-gray-900 text-white"
     >
       <div className="space-y-6">
         <div className={`p-4 rounded-md ${getSeverityClass(alert.severity)}`}>
@@ -412,48 +415,48 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Alert Details</h3>
-            <div className="bg-gray-50 rounded-md p-4">
+            <h3 className="text-sm font-medium text-gray-300 mb-2">Alert Details</h3>
+            <div className="bg-gray-800 rounded-md p-4">
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                <dt className="text-gray-500">Type:</dt>
+                <dt className="text-gray-400">Type:</dt>
                 <dd className="capitalize">{alert.type}</dd>
                 
-                <dt className="text-gray-500">Category:</dt>
+                <dt className="text-gray-400">Category:</dt>
                 <dd className="capitalize">{alert.category}</dd>
                 
-                <dt className="text-gray-500">Severity:</dt>
+                <dt className="text-gray-400">Severity:</dt>
                 <dd className="capitalize">{alert.severity}</dd>
                 
-                <dt className="text-gray-500">Status:</dt>
+                <dt className="text-gray-400">Status:</dt>
                 <dd>
                   <span className={`px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${getStatusClass(alert.status)}`}>
                     {alert.status}
                   </span>
                 </dd>
                 
-                <dt className="text-gray-500">Created:</dt>
+                <dt className="text-gray-400">Created:</dt>
                 <dd>{formatDate(alert.createdAt)}</dd>
                 
                 {alert.resolvedAt && (
                   <>
-                    <dt className="text-gray-500">Resolved:</dt>
+                    <dt className="text-gray-400">Resolved:</dt>
                     <dd>{formatDate(alert.resolvedAt)}</dd>
                     
-                    <dt className="text-gray-500">Time to Resolve:</dt>
+                    <dt className="text-gray-400">Time to Resolve:</dt>
                     <dd>{formatDuration(alert.createdAt, alert.resolvedAt)}</dd>
                   </>
                 )}
                 
                 {alert.assignedTo && (
                   <>
-                    <dt className="text-gray-500">Assigned To:</dt>
+                    <dt className="text-gray-400">Assigned To:</dt>
                     <dd>{alert.assignedTo}</dd>
                   </>
                 )}
                 
                 {alert.location && (
                   <>
-                    <dt className="text-gray-500">Location:</dt>
+                    <dt className="text-gray-400">Location:</dt>
                     <dd>{alert.location}</dd>
                   </>
                 )}
@@ -462,23 +465,23 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
           </div>
           
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Status Updates</h3>
-            <div className="bg-gray-50 rounded-md p-4 max-h-60 overflow-y-auto">
+            <h3 className="text-sm font-medium text-gray-300 mb-2">Status Updates</h3>
+            <div className="bg-gray-800 rounded-md p-4 max-h-60 overflow-y-auto">
               {alert.statusUpdates && alert.statusUpdates.length > 0 ? (
                 <div className="space-y-3">
                   {alert.statusUpdates.map((update, index) => (
-                    <div key={index} className="pb-3 border-b border-gray-200 last:border-0">
+                    <div key={index} className="pb-3 border-b border-gray-700 last:border-0">
                       <div className="flex justify-between text-sm">
                         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${getStatusClass(update.status)}`}>
                           {update.status}
                         </span>
-                        <span className="text-gray-500">{formatDate(update.timestamp)}</span>
+                        <span className="text-gray-400">{formatDate(update.timestamp)}</span>
                       </div>
                       {update.note && (
-                        <p className="mt-1 text-sm">{update.note}</p>
+                        <p className="mt-1 text-sm text-gray-300">{update.note}</p>
                       )}
                       {update.updatedBy && (
-                        <div className="mt-1 flex items-center text-xs text-gray-500">
+                        <div className="mt-1 flex items-center text-xs text-gray-400">
                           <User size={12} className="mr-1" />
                           {update.updatedBy}
                         </div>
@@ -487,7 +490,7 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No status updates available</p>
+                <p className="text-sm text-gray-400">No status updates available</p>
               )}
             </div>
           </div>
@@ -495,16 +498,16 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
         
         {alert.status !== 'resolved' && (
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Update Status</h3>
-            <div className="bg-gray-50 rounded-md p-4">
+            <h3 className="text-sm font-medium text-gray-300 mb-2">Update Status</h3>
+            <div className="bg-gray-800 rounded-md p-4">
               <div className="mb-3">
-                <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="note" className="block text-sm font-medium text-gray-300 mb-1">
                   Add a note (optional)
                 </label>
                 <textarea
                   id="note"
                   rows="2"
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-600 bg-gray-900 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Add details about this status change..."
@@ -518,6 +521,7 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                     size="sm"
                     onClick={() => handleStatusChange('acknowledged')}
                     disabled={submitting}
+                    className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105"
                   >
                     {submitting ? <Loader size="sm" color="white" className="mr-1" /> : null}
                     Acknowledge
@@ -530,6 +534,7 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                     size="sm"
                     onClick={() => handleStatusChange('inProgress')}
                     disabled={submitting}
+                    className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105"
                   >
                     {submitting ? <Loader size="sm" color="white" className="mr-1" /> : null}
                     In Progress
@@ -541,6 +546,7 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                   size="sm"
                   onClick={() => handleStatusChange('resolved')}
                   disabled={submitting}
+                  className="bg-green-600 hover:bg-green-500 text-white transition-all duration-300 transform hover:scale-105"
                 >
                   {submitting ? <Loader size="sm" color="white" className="mr-1" /> : null}
                   Resolve
@@ -551,6 +557,7 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                   size="sm"
                   onClick={() => handleStatusChange('ignored')}
                   disabled={submitting}
+                  className="bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105"
                 >
                   {submitting ? <Loader size="sm" color="white" className="mr-1" /> : null}
                   Ignore
@@ -562,8 +569,8 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
         
         {alert.relatedFeedback && alert.relatedFeedback.length > 0 && (
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Related Feedback</h3>
-            <div className="bg-gray-50 rounded-md p-4 max-h-40 overflow-y-auto">
+            <h3 className="text-sm font-medium text-gray-300 mb-2">Related Feedback</h3>
+            <div className="bg-gray-800 rounded-md p-4 max-h-40 overflow-y-auto">
               <ul className="space-y-2">
                 {alert.relatedFeedback.map((feedback) => (
                   <li key={feedback._id} className="text-sm">
@@ -578,8 +585,8 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                         )}
                       </div>
                       <div>
-                        <p className="line-clamp-2">{feedback.text}</p>
-                        <span className="text-xs text-gray-500">{formatDate(feedback.createdAt)}</span>
+                        <p className="line-clamp-2 text-gray-300">{feedback.text}</p>
+                        <span className="text-xs text-gray-400">{formatDate(feedback.createdAt)}</span>
                       </div>
                     </div>
                   </li>
@@ -593,7 +600,7 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
   );
 };
 
-// CreateAlertModal component
+// CreateAlertModal component (unchanged logic, styled)
 const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) => {
   const [formData, setFormData] = useState({
     event: '',
@@ -657,24 +664,25 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
       onClose={onClose}
       title="Create Manual Alert"
       size="md"
+      className="bg-gray-900 text-white"
     >
       <form onSubmit={handleSubmit}>
         {error && (
-          <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-4 rounded-md bg-red-900/20 p-4 text-sm text-red-300">
             {error}
           </div>
         )}
         
         <div className="space-y-4">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-300">
               Alert Title *
             </label>
             <input
               type="text"
               id="title"
               name="title"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               value={formData.title}
               onChange={handleChange}
               required
@@ -682,14 +690,14 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
           </div>
           
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-300">
               Description *
             </label>
             <textarea
               id="description"
               name="description"
               rows="3"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               value={formData.description}
               onChange={handleChange}
               required
@@ -698,13 +706,13 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="type" className="block text-sm font-medium text-gray-300">
                 Alert Type
               </label>
               <select
                 id="type"
                 name="type"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                 value={formData.type}
                 onChange={handleChange}
               >
@@ -715,13 +723,13 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
             </div>
             
             <div>
-              <label htmlFor="severity" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="severity" className="block text-sm font-medium text-gray-300">
                 Severity
               </label>
               <select
                 id="severity"
                 name="severity"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                 value={formData.severity}
                 onChange={handleChange}
               >
@@ -735,13 +743,13 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="category" className="block text-sm font-medium text-gray-300">
                 Category
               </label>
               <select
                 id="category"
                 name="category"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                 value={formData.category}
                 onChange={handleChange}
               >
@@ -752,14 +760,14 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
             </div>
             
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="location" className="block text-sm font-medium text-gray-300">
                 Location (Optional)
               </label>
               <input
                 type="text"
                 id="location"
                 name="location"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
                 placeholder="E.g. Main Hall, Room 3, etc."
                 value={formData.location}
                 onChange={handleChange}
@@ -774,6 +782,7 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
             variant="secondary"
             onClick={onClose}
             disabled={loading}
+            className="bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105"
           >
             Cancel
           </Button>
@@ -782,6 +791,7 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
             type="submit"
             variant="primary"
             disabled={loading}
+            className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105"
           >
             {loading ? <Loader size="sm" color="white" className="mr-2" /> : null}
             Create Alert
@@ -792,7 +802,7 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
   );
 };
 
-// BatchResolveModal component
+// BatchResolveModal component (unchanged logic, styled)
 const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
@@ -820,27 +830,28 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
       onClose={onClose}
       title={`Resolve ${selectedCount} Alerts`}
       size="md"
+      className="bg-gray-900 text-white"
     >
       <form onSubmit={handleSubmit}>
         {error && (
-          <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-4 rounded-md bg-red-900/20 p-4 text-sm text-red-300">
             {error}
           </div>
         )}
         
         <div>
-          <p className="text-gray-700">
+          <p className="text-gray-300">
             You are about to resolve {selectedCount} alert{selectedCount !== 1 ? 's' : ''}.
           </p>
           
           <div className="mt-4">
-            <label htmlFor="note" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="note" className="block text-sm font-medium text-gray-300">
               Resolution Note (Optional)
             </label>
             <textarea
               id="note"
               rows="3"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 bg-gray-800 text-white shadow-sm focus:border-[#9D174D] focus:ring-[#9D174D] sm:text-sm"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Add an optional note about resolving these alerts..."
@@ -854,6 +865,7 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
             variant="secondary"
             onClick={onClose}
             disabled={loading}
+            className="bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105"
           >
             Cancel
           </Button>
@@ -862,6 +874,7 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
             type="submit"
             variant="success"
             disabled={loading}
+            className="bg-green-600 hover:bg-green-500 text-white transition-all duration-300 transform hover:scale-105"
           >
             {loading ? <Loader size="sm" color="white" className="mr-2" /> : null}
             Resolve Alerts
@@ -872,19 +885,21 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
   );
 };
 
-// DeleteConfirmationModal component
+// DeleteConfirmationModal component (unchanged logic, styled)
 const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, isMultiple, count = 1, isDeleting }) => {
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={isMultiple ? `Delete ${count} Alerts` : 'Delete Alert'}
+      className="bg-gray-900 text-white"
       footer={
         <>
           <Button
             variant="secondary"
             onClick={onClose}
             disabled={isDeleting}
+            className="bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105"
           >
             Cancel
           </Button>
@@ -893,6 +908,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, isMultiple, count
             variant="danger"
             onClick={onConfirm}
             disabled={isDeleting}
+            className="bg-red-600 hover:bg-red-500 text-white transition-all duration-300 transform hover:scale-105"
           >
             {isDeleting ? <Loader size="sm" color="white" className="mr-2" /> : null}
             Delete
@@ -900,68 +916,68 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, isMultiple, count
         </>
       }
     >
-      <p className="text-gray-700">
+      <p className="text-gray-300">
         Are you sure you want to delete {isMultiple ? `these ${count} alerts` : 'this alert'}?
       </p>
-      <p className="mt-2 text-sm text-gray-500">
+      <p className="mt-2 text-sm text-gray-400">
         This action cannot be undone. {isMultiple ? 'These alerts' : 'This alert'} will be permanently deleted from the database.
       </p>
     </Modal>
   );
 };
 
-// AlertStats component
+// AlertStats component (unchanged logic, styled)
 const AlertStats = ({ alertCounts }) => {
   if (!alertCounts) {
-    return <Loader />;
+    return <Loader className="text-[#9D174D] animate-spin" />;
   }
   
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <Card className="bg-red-50">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+      <Card className="bg-white/5 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <div className="flex items-start">
           <div className="mr-3">
-            <Bell className="h-8 w-8 text-red-600" />
+            <Bell className="h-8 w-8 text-[#9D174D]" />
           </div>
           <div>
-            <p className="text-xs uppercase font-medium text-red-800">New Alerts</p>
-            <h3 className="text-2xl font-bold text-red-900">{alertCounts.new || 0}</h3>
+            <p className="text-xs uppercase font-medium text-gray-300">New Alerts</p>
+            <h3 className="text-2xl font-bold text-white">{alertCounts.new || 0}</h3>
           </div>
         </div>
       </Card>
       
-      <Card className="bg-yellow-50">
+      <Card className="bg-white/5 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <div className="flex items-start">
           <div className="mr-3">
-            <Clock className="h-8 w-8 text-yellow-600" />
+            <Clock className="h-8 w-8 text-[#9D174D]" />
           </div>
           <div>
-            <p className="text-xs uppercase font-medium text-yellow-800">In Progress</p>
-            <h3 className="text-2xl font-bold text-yellow-900">{alertCounts.inProgress || 0}</h3>
+            <p className="text-xs uppercase font-medium text-gray-300">In Progress</p>
+            <h3 className="text-2xl font-bold text-white">{alertCounts.inProgress || 0}</h3>
           </div>
         </div>
       </Card>
       
-      <Card className="bg-green-50">
+      <Card className="bg-white/5 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <div className="flex items-start">
           <div className="mr-3">
-            <CheckCircle className="h-8 w-8 text-green-600" />
+            <CheckCircle className="h-8 w-8 text-[#9D174D]" />
           </div>
           <div>
-            <p className="text-xs uppercase font-medium text-green-800">Resolved</p>
-            <h3 className="text-2xl font-bold text-green-900">{alertCounts.resolved || 0}</h3>
+            <p className="text-xs uppercase font-medium text-gray-300">Resolved</p>
+            <h3 className="text-2xl font-bold text-white">{alertCounts.resolved || 0}</h3>
           </div>
         </div>
       </Card>
       
-      <Card className="bg-blue-50">
+      <Card className="bg-white/5 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <div className="flex items-start">
           <div className="mr-3">
-            <AlertCircle className="h-8 w-8 text-blue-600" />
+            <AlertCircle className="h-8 w-8 text-[#9D174D]" />
           </div>
           <div>
-            <p className="text-xs uppercase font-medium text-blue-800">Total</p>
-            <h3 className="text-2xl font-bold text-blue-900">{alertCounts.total || 0}</h3>
+            <p className="text-xs uppercase font-medium text-gray-300">Total</p>
+            <h3 className="text-2xl font-bold text-white">{alertCounts.total || 0}</h3>
           </div>
         </div>
       </Card>
@@ -969,7 +985,7 @@ const AlertStats = ({ alertCounts }) => {
   );
 };
 
-// Main Alerts component
+// Main Alerts component (unchanged logic, styled)
 const Alerts = () => {
   const { selectedEvent } = useContext(EventContext);
   const { newAlert } = useContext(SocketContext);
@@ -1007,7 +1023,6 @@ const Alerts = () => {
   const [alertToDelete, setAlertToDelete] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   
-  // Load alert types
   useEffect(() => {
     const loadAlertTypes = async () => {
       try {
@@ -1022,7 +1037,6 @@ const Alerts = () => {
     loadAlertTypes();
   }, []);
   
-  // Fetch alerts when event or filters change
   useEffect(() => {
     if (selectedEvent) {
       fetchAlerts();
@@ -1030,7 +1044,6 @@ const Alerts = () => {
     }
   }, [selectedEvent, pagination.page]);
   
-  // Handle new alert from socket
   useEffect(() => {
     if (newAlert && selectedEvent && newAlert.event === selectedEvent._id) {
       setAlerts(prev => [newAlert, ...prev]);
@@ -1204,15 +1217,15 @@ const Alerts = () => {
   
   if (!selectedEvent) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center p-6">
+      <div className="flex flex-col items-center justify-center h-96 animate-fade-in bg-[#00001A] rounded-xl">
         <Bell size={48} className="mb-4 text-gray-400" />
-        <h3 className="text-lg font-medium text-gray-900">No event selected</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="text-xl font-semibold text-white">No event selected</h3>
+        <p className="mt-1 text-sm text-gray-400">
           Please select an event to view alerts.
         </p>
         <Button
           variant="primary"
-          className="mt-4"
+          className="mt-4 bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
           onClick={() => window.location.href = '/events'}
         >
           Go to Events
@@ -1222,30 +1235,38 @@ const Alerts = () => {
   }
   
   return (
-    <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Alerts for {selectedEvent.name}</h1>
-        <div className="flex space-x-3">
-          <Button
-            variant="secondary"
-            onClick={handleRefresh}
-            icon={<RefreshCw size={16} className="mr-2" />}
-            disabled={loading}
-          >
-            Refresh
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => setShowCreateModal(true)}
-            icon={<Plus size={16} className="mr-2" />}
-          >
-            Create Alert
-          </Button>
+    <div className="p-6 bg-[#00001A] min-h-screen">
+      <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-white bg-gradient-to-r from-[#9D174D] to-[#C53070] bg-clip-text text-transparent">
+              Alerts for {selectedEvent.name}
+            </h1>
+          </div>
+          <div className="flex space-x-3">
+            <Button
+              variant="secondary"
+              onClick={handleRefresh}
+              icon={<RefreshCw size={16} className="mr-2" />}
+              disabled={loading}
+              className="bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105"
+            >
+              Refresh
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => setShowCreateModal(true)}
+              icon={<Plus size={16} className="mr-2" />}
+              className="bg-[#9D174D] hover:bg-[#C53070] text-white transition-all duration-300 transform hover:scale-105"
+            >
+              Create Alert
+            </Button>
+          </div>
         </div>
       </div>
       
       {error && (
-        <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-700">
+        <div className="mb-6 rounded-md bg-red-900/20 p-4 text-sm text-red-300">
           {error}
         </div>
       )}
@@ -1259,11 +1280,11 @@ const Alerts = () => {
         alertTypes={alertTypes}
       />
       
-      <Card className="mb-4">
+      <Card className="mb-4 bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-lg font-medium">Alert List</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-lg font-semibold text-white">Alert List</h2>
+            <p className="text-sm text-gray-400">
               {pagination.total} total items • Page {pagination.page} of {pagination.totalPages || 1}
             </p>
           </div>
@@ -1273,6 +1294,7 @@ const Alerts = () => {
                 variant="success"
                 size="sm"
                 onClick={handleResolveSelected}
+                className="bg-green-600 hover:bg-green-500 text-white transition-all duration-300 transform hover:scale-105"
               >
                 Resolve Selected ({selectedIds.length})
               </Button>
@@ -1280,6 +1302,7 @@ const Alerts = () => {
                 variant="danger"
                 size="sm"
                 onClick={handleDeleteSelected}
+                className="bg-red-600 hover:bg-red-500 text-white transition-all duration-300 transform hover:scale-105"
               >
                 Delete Selected ({selectedIds.length})
               </Button>
@@ -1289,13 +1312,13 @@ const Alerts = () => {
         
         {loading ? (
           <div className="flex h-64 items-center justify-center">
-            <Loader size="lg" />
+            <Loader size="lg" className="text-[#9D174D] animate-spin" />
           </div>
         ) : alerts.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center">
             <Bell size={48} className="mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900">No alerts found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-white">No alerts found</h3>
+            <p className="mt-1 text-sm text-gray-400">
               Try adjusting your filters or create a new alert.
             </p>
           </div>
@@ -1317,10 +1340,11 @@ const Alerts = () => {
                     size="sm"
                     onClick={() => handlePageChange(Math.max(pagination.page - 1, 1))}
                     disabled={pagination.page === 1}
+                    className="bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105"
                   >
                     Previous
                   </Button>
-                  <span className="mx-4 text-sm text-gray-700">
+                  <span className="mx-4 text-sm text-gray-300">
                     Page {pagination.page} of {pagination.totalPages}
                   </span>
                   <Button
@@ -1328,6 +1352,7 @@ const Alerts = () => {
                     size="sm"
                     onClick={() => handlePageChange(Math.min(pagination.page + 1, pagination.totalPages))}
                     disabled={pagination.page === pagination.totalPages}
+                    className="bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105"
                   >
                     Next
                   </Button>
