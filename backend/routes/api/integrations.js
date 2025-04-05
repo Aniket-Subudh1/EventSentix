@@ -30,6 +30,8 @@ router.delete('/twitter/stream/:eventId',
   integrationController.stopTwitterStream
 );
 
+router.post('/twitter/search', integrationController.searchTwitter);
+
 router.post('/instagram/connect',
   integrationController.connectInstagram
 );
