@@ -9,59 +9,44 @@ const logger = require('../../utils/logger');
 
 exports.generateEventSummary = async (eventId) => {
   try {
-    const event = await Event.findById(eventId);
-    if (!event) {
-      throw new Error(`Event not found: ${eventId}`);
-    }
-    
-    const sentimentOverview = await sentimentAggregator.getSentimentOverview(eventId);
-    
-    const feedbackVolume = await sentimentAggregator.getFeedbackVolume(eventId, {
-      groupBy: 'hour'
+    const feedbacks = await Feedback.find({ event: eventId });
+    const totalFeedback = feedbacks.length;
+
+    // Define all possible sentiments from the model
+    const sentimentTypes = ['positive', 'neutral', 'negative', 'angry', 'happy', 'sad', 'fear', 'surprise'];
+    const sentimentBreakdown = {};
+    sentimentTypes.forEach(sentiment => {
+      sentimentBreakdown[sentiment] = {
+        count: feedbacks.filter(f => f.sentiment === sentiment).length,
+        percentage: totalFeedback > 0 ? (feedbacks.filter(f => f.sentiment === sentiment).length / totalFeedback) * 100 : 0,
+      };
     });
-    
-    const alertStats = await getAlertStats(eventId);
-    
-    const trendingTopics = await trendDetector.detectTrendingTopics(eventId, {
-      timeWindow: 60,
-      minMentions: 2
-    });
-    
-    const issueStats = await getIssueStats(eventId);
-    
-    const insights = generateKeyInsights(
-      sentimentOverview,
-      alertStats,
-      issueStats,
-      trendingTopics
-    );
-    
-    return {
-      event: {
-        id: event._id,
-        name: event.name,
-        startDate: event.startDate,
-        endDate: event.endDate,
-        location: event.location,
-        isActive: event.isActive
-      },
+
+    const summary = {
       overview: {
-        totalFeedback: sentimentOverview.total,
-        sentimentBreakdown: sentimentOverview.sentiment,
-        topSources: sentimentOverview.sources.slice(0, 3),
-        topIssues: sentimentOverview.issues.slice(0, 3)
+        totalFeedback,
+        sentimentBreakdown,
+        topIssues: [], // Add logic if needed
+        topSources: [
+          {
+            source: 'twitter',
+            count: feedbacks.filter(f => f.source === 'twitter').length,
+            percentage: totalFeedback > 0 ? (feedbacks.filter(f => f.source === 'twitter').length / totalFeedback) * 100 : 0,
+          },
+          // Add other sources if needed
+        ],
       },
-      alerts: alertStats,
-      issues: issueStats,
-      trends: {
-        topics: trendingTopics.topics.slice(0, 5),
-        volume: feedbackVolume.volume.slice(-12) // Last 12 hours
-      },
-      insights
+      alerts: { active: 0, resolved: 0, total: 0 }, // Placeholder
+      trends: { topics: [] }, // Placeholder
+      insights: totalFeedback > 0
+        ? [{ type: 'info', title: 'Feedback Collected', description: `${totalFeedback} feedback items collected.` }]
+        : [],
     };
+
+    return summary;
   } catch (error) {
     logger.error(`Generate event summary error: ${error.message}`, { error, eventId });
-    throw error;
+    throw error; // Let asyncHandler catch it
   }
 };
 

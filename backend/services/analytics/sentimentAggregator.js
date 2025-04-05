@@ -87,65 +87,67 @@ exports.getSentimentTrend = async (eventId, options = {}) => {
 
     const groupByTimeframe = (date) => {
       const groupedDate = new Date(date);
-      // if (timeframe === 'minute') groupedDate.setSeconds(0, 0);
       if (timeframe === 'hour') groupedDate.setMinutes(0, 0, 0);
       else if (timeframe === 'day') groupedDate.setHours(0, 0, 0, 0);
       else if (timeframe === 'week') {
         const startOfMonth = new Date(groupedDate.getFullYear(), groupedDate.getMonth(), 1);
         const daysSinceMonthStart = Math.floor((groupedDate - startOfMonth) / (1000 * 60 * 60 * 24));
-        const weekNumber = Math.floor(daysSinceMonthStart / 7) + 1; // Week 1, Week 2, etc.
-        groupedDate.setDate(1 + (weekNumber - 1) * 7); // Start of the week
+        const weekNumber = Math.floor(daysSinceMonthStart / 7) + 1;
+        groupedDate.setDate(1 + (weekNumber - 1) * 7);
         groupedDate.setHours(0, 0, 0, 0);
       }
       return groupedDate.toISOString();
     };
 
+    const sentimentTypes = ['positive', 'neutral', 'negative', 'angry', 'happy', 'sad', 'fear', 'surprise'];
     const sentimentTrend = new Map();
 
     feedback.forEach((item) => {
       const timeKey = groupByTimeframe(item.createdAt);
 
       if (!sentimentTrend.has(timeKey)) {
+        const initialSentiments = {};
+        sentimentTypes.forEach(sentiment => {
+          initialSentiments[sentiment] = { count: 0, percentage: 0 };
+        });
         sentimentTrend.set(timeKey, {
           timestamp: new Date(timeKey),
-          positive: { count: 0, percentage: 0 },
-          neutral: { count: 0, percentage: 0 },
-          negative: { count: 0, percentage: 0 },
+          ...initialSentiments,
           total: 0,
         });
       }
 
       const record = sentimentTrend.get(timeKey);
-      record[item.sentiment].count++;
+      if (sentimentTypes.includes(item.sentiment)) {
+        record[item.sentiment].count++;
+      } else {
+        logger.warn(`Unknown sentiment value '${item.sentiment}' for feedback ${item._id}`);
+        record.neutral.count++; // Fallback to neutral for invalid sentiments
+      }
       record.total++;
     });
 
-    // Calculate percentages
     sentimentTrend.forEach((record) => {
-      record.positive.percentage = record.total > 0 ? (record.positive.count / record.total) * 100 : 0;
-      record.neutral.percentage = record.total > 0 ? (record.neutral.count / record.total) * 100 : 0;
-      record.negative.percentage = record.total > 0 ? (record.negative.count / record.total) * 100 : 0;
+      sentimentTypes.forEach(sentiment => {
+        record[sentiment].percentage = record.total > 0 ? (record[sentiment].count / record.total) * 100 : 0;
+      });
     });
 
-    // Convert map to sorted array
     const timeline = Array.from(sentimentTrend.values())
       .sort((a, b) => a.timestamp - b.timestamp)
       .slice(-limit);
 
-    // Calculate weekly totals if timeframe is 'week'
     let weeklyTotals = null;
     if (timeframe === 'week') {
-      weeklyTotals = {
-        positive: 0,
-        neutral: 0,
-        negative: 0,
-        total: 0,
-      };
-
+      weeklyTotals = {};
+      sentimentTypes.forEach(sentiment => {
+        weeklyTotals[sentiment] = 0;
+      });
+      weeklyTotals.total = 0;
       timeline.forEach((record) => {
-        weeklyTotals.positive += record.positive.count;
-        weeklyTotals.neutral += record.neutral.count;
-        weeklyTotals.negative += record.negative.count;
+        sentimentTypes.forEach(sentiment => {
+          weeklyTotals[sentiment] += record[sentiment].count;
+        });
         weeklyTotals.total += record.total;
       });
     }
