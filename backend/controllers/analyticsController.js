@@ -249,95 +249,90 @@ exports.getEventSummary = asyncHandler(async (req, res) => {
 });
 
 exports.getDashboardData = asyncHandler(async (req, res) => {
-  // Get event
-  const event = await Event.findById(req.params.eventId);
+  const eventId = req.params.eventId;
   
-  if (!event) {
-    return res.status(404).json({
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
+    }
+
+    // Explicitly calculate sentiment breakdown
+    const feedbacks = await Feedback.find({ event: eventId });
+    const sentimentCounts = {
+      positive: feedbacks.filter(f => f.sentiment === 'positive').length,
+      neutral: feedbacks.filter(f => f.sentiment === 'neutral').length,
+      negative: feedbacks.filter(f => f.sentiment === 'negative').length
+    };
+
+    const activeAlerts = await Alert.countDocuments({
+      event: eventId,
+      status: { $in: ['new', 'acknowledged', 'inProgress'] }
+    });
+
+    const recentFeedback = await Feedback.countDocuments({
+      event: eventId,
+      createdAt: { $gte: new Date(Date.now() - 60 * 60 * 1000) } // Last hour
+    });
+
+    const latestFeedback = await Feedback.find({ event: eventId })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    const latestAlerts = await Alert.find({ event: eventId })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    const trendingTopics = await trendDetector.detectTrendingTopics(
+      eventId,
+      { timeWindow: 60, minMentions: 2, maxTopics: 5 }
+    );
+
+    // Enhanced logging
+    console.log('Dashboard Data Debug:', {
+      eventId,
+      sentimentCounts,
+      activeAlerts,
+      recentFeedback,
+      latestFeedbackCount: latestFeedback.length,
+      latestAlertsCount: latestAlerts.length,
+      trendingTopicsCount: trendingTopics.topics.length
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        event: {
+          name: event.name,
+          startDate: event.startDate,
+          endDate: event.endDate,
+          location: event.location,
+          isActive: event.isActive
+        },
+        alerts: {
+          active: activeAlerts,
+          latest: latestAlerts
+        },
+        feedback: {
+          recent: recentFeedback,
+          latest: latestFeedback,
+          sentiment: sentimentCounts  // Explicitly include sentiment counts
+        },
+        trends: trendingTopics.topics
+      }
+    });
+  } catch (error) {
+    console.error('Dashboard Data Fetch Error:', error);
+    res.status(500).json({
       success: false,
-      message: 'Event not found'
+      message: 'Failed to fetch dashboard data',
+      error: error.message
     });
   }
-  
-
-  const activeAlerts = await Alert.countDocuments({
-    event: req.params.eventId,
-    status: { $in: ['new', 'acknowledged', 'inProgress'] }
-  });
-  
-
-  const recentFeedback = await Feedback.countDocuments({
-    event: req.params.eventId,
-    createdAt: { $gte: new Date(Date.now() - 60 * 60 * 1000) } // Last hour
-  });
-  
-
-  const lastHourSentiment = await Feedback.aggregate([
-    { 
-      $match: { 
-        event: req.params.eventId,
-        createdAt: { $gte: new Date(Date.now() - 60 * 60 * 1000) }
-      } 
-    },
-    {
-      $group: {
-        _id: '$sentiment',
-        count: { $sum: 1 }
-      }
-    }
-  ]);
-  
-
-  const sentimentCounts = {
-    positive: 0,
-    neutral: 0,
-    negative: 0
-  };
-  
-  lastHourSentiment.forEach(item => {
-    sentimentCounts[item._id] = item.count;
-  });
-  
-
-  const trendingTopics = await trendDetector.detectTrendingTopics(
-    req.params.eventId,
-    { timeWindow: 60, minMentions: 2, maxTopics: 5 }
-  );
-  
-
-  const latestAlerts = await Alert.find({ event: req.params.eventId })
-    .sort({ createdAt: -1 })
-    .limit(5);
-  
-
-  const latestFeedback = await Feedback.find({ event: req.params.eventId })
-    .sort({ createdAt: -1 })
-    .limit(5);
-  
-  res.status(200).json({
-    success: true,
-    data: {
-      event: {
-        name: event.name,
-        startDate: event.startDate,
-        endDate: event.endDate,
-        location: event.location,
-        isActive: event.isActive
-      },
-      alerts: {
-        active: activeAlerts,
-        latest: latestAlerts
-      },
-      feedback: {
-        recent: recentFeedback,
-        latest: latestFeedback,
-        sentiment: sentimentCounts
-      },
-      trends: trendingTopics.topics
-    }
-  });
 });
-
 
 exports.getFeedbackVolume = asyncHandler(async (req, res) => {
   const { groupBy, startTime, endTime } = req.query;

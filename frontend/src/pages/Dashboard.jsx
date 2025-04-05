@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useCallback } from "react"
 import { EventContext } from "../context/EventContext"
 import { SocketContext } from "../context/SocketContext"
 import analyticsService from "../services/analyticsService"
@@ -43,6 +43,7 @@ const Dashboard = () => {
 
       console.log("Fetching dashboard data for event:", eventId)
       const data = await analyticsService.getDashboardData(eventId)
+      console.log("Dashboard data fetched:", data)
       setDashboardData(data)
       setLastRefresh(Date.now())
     } catch (err) {

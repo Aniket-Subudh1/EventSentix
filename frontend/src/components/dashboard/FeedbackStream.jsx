@@ -5,26 +5,26 @@ import { MessageCircle, Smile, Meh, Frown, Twitter, Instagram, Linkedin, Externa
 const getSentimentIcon = (sentiment) => {
   switch (sentiment) {
     case 'positive':
-      return <Smile className="text-green-500" size={16} />;
+      return <Smile className="text-green-300" size={16} />;
     case 'neutral':
-      return <Meh className="text-gray-500" size={16} />;
+      return <Meh className="text-gray-300" size={16} />;
     case 'negative':
-      return <Frown className="text-red-500" size={16} />;
+      return <Frown className="text-red-300" size={16} />;
     default:
-      return <Meh className="text-gray-500" size={16} />;
+      return <Meh className="text-gray-300" size={16} />;
   }
 };
 
 const getSentimentClass = (sentiment) => {
   switch (sentiment) {
     case 'positive':
-      return 'bg-green-50 border-green-200';
+      return 'bg-green-900/20 border-green-700';
     case 'neutral':
-      return 'bg-gray-50 border-gray-200';
+      return 'bg-gray-900/20 border-gray-700';
     case 'negative':
-      return 'bg-red-50 border-red-200';
+      return 'bg-red-900/20 border-red-700';
     default:
-      return 'bg-gray-50 border-gray-200';
+      return 'bg-gray-900/20 border-gray-700';
   }
 };
 
@@ -37,7 +37,7 @@ const getSourceIcon = (source) => {
     case 'linkedin':
       return <Linkedin size={14} className="text-blue-700" />;
     default:
-      return <MessageCircle size={14} className="text-gray-500" />;
+      return <MessageCircle size={14} className="text-gray-300" />;
   }
 };
 
@@ -68,16 +68,16 @@ const FeedbackItem = ({ feedback }) => {
         <div className="flex items-start">
           {getSentimentIcon(feedback.sentiment)}
           <div className="ml-2">
-            <p className="text-sm">{truncateText(feedback.text)}</p>
+            <p className="text-sm text-gray-300">{truncateText(feedback.text)}</p>
             {feedback.issueType && (
-              <span className="inline-block mt-1 px-2 py-0.5 bg-gray-200 text-gray-700 text-xs rounded-full">
+              <span className="inline-block mt-1 px-2 py-0.5 bg-gray-800 text-gray-300 text-xs rounded-full">
                 {feedback.issueType}
               </span>
             )}
           </div>
         </div>
       </div>
-      <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+      <div className="flex justify-between items-center mt-2 text-xs text-gray-400">
         <div className="flex items-center space-x-2">
           <span className="flex items-center">
             {getSourceIcon(feedback.source)}
@@ -95,7 +95,7 @@ const FeedbackItem = ({ feedback }) => {
               className="ml-2"
               title="View original"
             >
-              <ExternalLink size={12} />
+              <ExternalLink size={12} className="text-gray-300" />
             </a>
           )}
         </div>
@@ -109,12 +109,12 @@ const FeedbackStream = ({ feedback = [], className }) => {
     <div className={className}>
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
-          <MessageCircle className="text-blue-500 mr-2" size={20} />
-          <h3 className="text-lg font-semibold">Live Feedback</h3>
+          <MessageCircle className="text-blue-400 mr-2" size={20} />
+          <h3 className="text-lg font-semibold text-white">Live Feedback</h3>
         </div>
         <Link 
           to="/feedback" 
-          className="text-sm text-blue-600 hover:text-blue-800"
+          className="text-sm text-blue-400 hover:text-blue-300"
         >
           View All
         </Link>
@@ -123,9 +123,9 @@ const FeedbackStream = ({ feedback = [], className }) => {
       {feedback.length === 0 ? (
         <div className="text-center p-6">
           <div className="flex justify-center mb-2">
-            <MessageCircle className="text-gray-400" size={24} />
+            <MessageCircle className="text-gray-500" size={24} />
           </div>
-          <p className="text-gray-500">No feedback available</p>
+          <p className="text-gray-400">No feedback available</p>
         </div>
       ) : (
         <div className="space-y-2 max-h-96 overflow-y-auto">
