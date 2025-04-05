@@ -21,7 +21,7 @@ const ChatMessage = ({ message, isUser }) => (
         {!isUser && (
           <>
             <User size={16} />
-            <span className="text-xs font-medium">{message.user}</span>
+            <span className="text-xs font-medium">{message.user || 'Anonymous'}</span>
           </>
         )}
         {message.sentiment && (
@@ -46,17 +46,18 @@ const Chat = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
+  const [tempName, setTempName] = useState('');
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    if (!username) return;
+
     const initializeChat = async () => {
       try {
-        const name = prompt('Enter your name:') || 'Anonymous';
-        setUsername(name);
         await socketService.connect();
         socketService.joinEvent(eventId);
-
-        socketService.on('new-message', handleNewMessage);
+        // Listen to "new-feedback" which is broadcast by the server
+        socketService.on('new-feedback', handleNewMessage);
         setIsConnected(true);
         setLoading(false);
       } catch (error) {
@@ -64,20 +65,20 @@ const Chat = () => {
         setLoading(false);
       }
     };
+
     initializeChat();
 
     return () => {
-      socketService.off('new-message');
+      socketService.off('new-feedback');
       socketService.leaveEvent(eventId);
     };
-  }, [eventId]);
+  }, [eventId, username]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleNewMessage = (message) => {
-    // Avoid duplicates based on sourceId
     setMessages((prev) => {
       const exists = prev.some((m) => m.sourceId === message.sourceId);
       return exists ? prev : [...prev, message];
@@ -88,24 +89,19 @@ const Chat = () => {
     if (!inputMessage.trim()) return;
 
     const newMsg = {
-      event: eventId,
+      eventId,
       text: inputMessage.trim(),
-      user: username,
+      user: username, // Pass the username
       createdAt: new Date(),
       source: 'direct',
       sourceId: `${Date.now()}-${uuidv4().slice(0, 8)}`,
       userId: socketService.getUserId()
     };
 
-    // Show message locally instantly
+    // Optimistic update
     handleNewMessage(newMsg);
-
-    try {
-      await socketService.submitFeedback(newMsg);
-    } catch (error) {
-      console.error('Send failed:', error);
-      alert('Could not send message. Try again.');
-    }
+    // Send to backend via socket
+    socketService.socket.emit('submit-feedback', newMsg);
 
     setInputMessage('');
   };
@@ -117,21 +113,52 @@ const Chat = () => {
     }
   };
 
-  if (loading) return (
-    <div className="flex h-screen items-center justify-center">
-      <Loader size="lg" />
-    </div>
-  );
+  const handleNameSubmit = () => {
+    if (tempName.trim()) {
+      setUsername(tempName.trim());
+    }
+  };
 
-  if (!isConnected) return (
-    <div className="flex h-screen items-center justify-center p-6 bg-red-50">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-red-800 mb-4">Unable to Connect</h2>
-        <p className="text-red-600 mb-4">Please try again later.</p>
-        <Button variant="primary" onClick={() => window.location.reload()}>Retry</Button>
+  if (!username) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-white">
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md text-center space-y-4 w-80">
+          <h2 className="text-xl font-semibold">Enter your name</h2>
+          <input
+            type="text"
+            value={tempName}
+            onChange={(e) => setTempName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleNameSubmit();
+            }}
+            className="border border-gray-300 px-3 py-2 rounded-md w-full"
+            placeholder="Your name"
+          />
+          <Button variant="primary" onClick={handleNameSubmit}>Join Chat</Button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader size="lg" />
+      </div>
+    );
+  }
+
+  if (!isConnected) {
+    return (
+      <div className="flex h-screen items-center justify-center p-6 bg-red-50">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-800 mb-4">Unable to Connect</h2>
+          <p className="text-red-600 mb-4">Please try again later.</p>
+          <Button variant="primary" onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
