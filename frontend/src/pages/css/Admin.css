@@ -1,0 +1,149 @@
+.admin-panel {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  .dashboard-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .map-container {
+    margin-bottom: 20px;
+  }
+  .alerts-container {
+    flex: 1;
+  }
+  .alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .alert-card {
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .alert-card:hover {
+    background-color: #e9ecef;
+  }
+  .alert-card.new {
+    border-left: 4px solid #dc3545;
+  }
+  .alert-card.acknowledged {
+    border-left: 4px solid #fd7e14;
+  }
+  .alert-card.inProgress {
+    border-left: 4px solid #ffc107;
+  }
+  .alert-card.resolved {
+    border-left: 4px solid #28a745;
+  }
+  .alert-card.sos {
+    background-color: #ffe6e6;
+    border-left: 4px solid #dc3545;
+  }
+  .alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .alert-header h3 {
+    margin: 0;
+    font-size: 16px;
+  }
+  .date {
+    font-size: 12px;
+    color: #666;
+  }
+  .message {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+  .location-details {
+    font-size: 12px;
+    color: #555;
+  }
+  .alert-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  .action-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    color: white;
+  }
+  .action-btn.acknowledge {
+    background-color: #fd7e14;
+  }
+  .action-btn.in-progress {
+    background-color: #ffc107;
+  }
+  .action-btn.resolve {
+    background-color: #28a745;
+  }
+  .action-btn.delete {
+    background-color: #dc3545;
+  }
+  .status-message {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .status-message.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .status-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .delete-modal {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+  }
+  .delete-modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+  }
+  .cancel-btn {
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .confirm-delete-btn {
+    padding: 8px 16px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
