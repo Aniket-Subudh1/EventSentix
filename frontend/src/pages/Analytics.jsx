@@ -16,6 +16,7 @@ import {
   Activity,
   TrendingUp
 } from 'react-feather';
+import { useNavigate } from 'react-router-dom';
 
 const AnalyticsDashboard = () => {
   const { selectedEvent: contextEvent, events } = useContext(EventContext);
@@ -23,6 +24,7 @@ const AnalyticsDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState('day');
+  const navigate = useNavigate();
   
   const location = useLocation();
   const { eventId } = useParams();
@@ -254,8 +256,26 @@ const AnalyticsDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Add similar styling for other sections */}
+{selectedEvent && (
+  <div className="bg-primary rounded-lg shadow-lg shadow-black/10 p-6 mt-6 animate-slide-in">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div>
+        <h3 className="text-xl font-bold text-primary-foreground mb-2">Post-Event Analysis</h3>
+        <p className="text-primary-foreground/70 mb-4 md:mb-0">
+          Get a comprehensive analysis of your event performance with actionable insights and recommendations for future improvements.
+        </p>
+      </div>
+      <Button
+        variant="primary"
+        className="bg-gradient-to-r from-accent to-accent-dark text-accent-foreground transition-all duration-200 transform hover:scale-105 px-6 py-3"
+        onClick={() => navigate(`/events/${selectedEvent._id || selectedEvent.id}/post-event-analysis`)}
+        icon={<BarChart2 size={20} />}
+      >
+        View Post-Event Analysis
+      </Button>
+    </div>
+  </div>
+)}
     </div>
   );
 };

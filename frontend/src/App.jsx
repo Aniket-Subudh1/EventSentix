@@ -21,8 +21,8 @@ import NotFound from './pages/NotFound';
 import EngagementLanding from './pages/EngagementLanding';
 import Chat from './pages/Chat';
 import SubmitFeedback from './pages/SubmitFeedback';
+import PostEventAnalysis from './pages/PostEventAnalyzer'; 
 
-// Protected route wrapper
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = authService.isAuthenticated();
 
@@ -130,6 +130,14 @@ function App() {
                             element={
                               <ProtectedRoute>
                                 <Analytics />
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/events/:eventId/post-event-analysis"
+                            element={
+                              <ProtectedRoute>
+                                <PostEventAnalysis />
                               </ProtectedRoute>
                             }
                           />

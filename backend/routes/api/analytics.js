@@ -3,6 +3,8 @@ const router = express.Router();
 const analyticsController = require('../../controllers/analyticsController');
 const { protect, checkEventOwnership } = require('../../middleware/auth');
 const { apiLimiter } = require('../../middleware/rateLimiter');
+const postEventAnalyticsController = require('../../controllers/postEventAnalyticsController');
+
 
 router.use(protect);
 
@@ -72,5 +74,28 @@ router.get('/wordcloud/:eventId',
   checkEventOwnership({ idField: 'eventId' }),
   analyticsController.getWordCloudData
 );
+router.get('/post-event/:eventId',
+  checkEventOwnership({ idField: 'eventId' }),
+  postEventAnalyticsController.generatePostEventReport
+);
 
+router.get('/post-event/:eventId/availability',
+  checkEventOwnership({ idField: 'eventId' }),
+  postEventAnalyticsController.checkReportAvailability
+);
+
+router.get('/post-event/:eventId/recommendations',
+  checkEventOwnership({ idField: 'eventId' }),
+  postEventAnalyticsController.getImprovementRecommendations
+);
+
+router.get('/post-event/:eventId/insights',
+  checkEventOwnership({ idField: 'eventId' }),
+  postEventAnalyticsController.getEventInsights
+);
+
+router.get('/post-event/:eventId/export',
+  checkEventOwnership({ idField: 'eventId' }),
+  postEventAnalyticsController.exportPostEventReport
+);
 module.exports = router;
