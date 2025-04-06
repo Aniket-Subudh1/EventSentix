@@ -29,35 +29,42 @@ const AdminPanel = () => {
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
   const [showDirections, setShowDirections] = useState(false);
-  const mapRef = useRef(null);
   const [googleLoaded, setGoogleLoaded] = useState(false);
+  const [watchId, setWatchId] = useState(null);
+  const mapRef = useRef(null);
 
   useEffect(() => {
-    // Parse alertId from URL query parameter
+    // Enhanced location tracking
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    };
+
+    const success = (position) => {
+      setCurrentPosition({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        accuracy: position.coords.accuracy
+      });
+    };
+
+    const error = (err) => {
+      console.error(`Location Error (${err.code}): ${err.message}`);
+    };
+
+    const id = navigator.geolocation.watchPosition(success, error, options);
+    setWatchId(id);
+
     const params = new URLSearchParams(location.search);
     const alertId = params.get('alertId');
 
-    // Get the current position of the admin
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCurrentPosition({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.error('Error getting current position:', error);
-      }
-    );
-
-    // Fetch all alerts when component mounts
-    const fetchAlerts = async (alertId) => {
+    const fetchAlerts = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/alerts/alertId`);
+        const res = await axios.get(`http://localhost:5000/api/alerts`);
         setAlerts(res.data);
         setLoading(false);
 
-        // If an alertId is provided, select that alert
         if (alertId) {
           const alert = res.data.find(a => a._id === alertId);
           if (alert) {
@@ -73,13 +80,12 @@ const AdminPanel = () => {
 
     fetchAlerts();
 
-    // Set up Socket.io for real-time updates
     const socket = io('http://localhost:5000', {
       withCredentials: true,
       extraHeaders: {
         "my-custom-header": "abcd"
       },
-      transports: ['websocket', 'polling'] // Try websocket first, then fallback to polling
+      transports: ['websocket', 'polling']
     });
 
     socket.on('new-alert', (newAlert) => {
@@ -109,24 +115,18 @@ const AdminPanel = () => {
       }
     });
 
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    });
-
-    socket.on('disconnect', (reason) => {
-      console.error('Disconnected from server:', reason);
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
-    });
+    socket.on('connect', () => console.log('Connected to server'));
+    socket.on('disconnect', (reason) => console.error('Disconnected:', reason));
+    socket.on('connect_error', (error) => console.error('Connection error:', error));
 
     return () => {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+      }
       socket.disconnect();
     };
   }, [location.search]);
 
-  // Fix: Add selectedAlert dependency to the dependency array
   useEffect(() => {
     if (selectedAlert && currentPosition && showDirections && selectedAlert.location) {
       if (googleLoaded) {
@@ -141,13 +141,9 @@ const AdminPanel = () => {
   }, [selectedAlert, currentPosition, showDirections, googleLoaded]);
 
   const calculateRoute = () => {
-    if (!window.google || !window.google.maps || !selectedAlert || !selectedAlert.location || 
-        selectedAlert.location.latitude == null || selectedAlert.location.longitude == null) {
-      return;
-    }
+    if (!window.google || !selectedAlert || !selectedAlert.location) return;
 
     const directionsService = new window.google.maps.DirectionsService();
-
     directionsService.route(
       {
         origin: currentPosition,
@@ -162,9 +158,8 @@ const AdminPanel = () => {
           setDirections(result);
           const route = result.routes[0];
           if (route && route.legs && route.legs[0]) {
-            const leg = route.legs[0];
-            setDistance(leg.distance.text);
-            setDuration(leg.duration.text);
+            setDistance(route.legs[0].distance.text);
+            setDuration(route.legs[0].duration.text);
           }
         } else {
           console.error(`Directions request failed: ${status}`);
@@ -201,11 +196,21 @@ const AdminPanel = () => {
     setShowDirections(!showDirections);
   };
 
-  const openInGoogleMaps = () => {
-    if (selectedAlert && currentPosition && selectedAlert.location && 
-        selectedAlert.location.latitude != null && selectedAlert.location.longitude != null) {
-      const userLat = selectedAlert.location.latitude;
-      const userLng = selectedAlert.location.longitude;
+  const viewOnMap = (alert) => {
+    if (alert.location?.latitude && alert.location?.longitude && mapRef.current) {
+      setSelectedAlert(alert);
+      mapRef.current.panTo({
+        lat: alert.location.latitude,
+        lng: alert.location.longitude
+      });
+      mapRef.current.setZoom(15);
+    }
+  };
+
+  const openInGoogleMaps = (alert = selectedAlert) => {
+    if (alert && currentPosition && alert.location) {
+      const userLat = alert.location.latitude;
+      const userLng = alert.location.longitude;
       const adminLat = currentPosition.lat;
       const adminLng = currentPosition.lng;
       const url = `https://www.google.com/maps/dir/?api=1&origin=${adminLat},${adminLng}&destination=${userLat},${userLng}&travelmode=driving`;
@@ -214,12 +219,8 @@ const AdminPanel = () => {
   };
 
   const zoomToFitRoute = () => {
-    if (!mapRef.current || !window.google || !window.google.maps || 
-        !selectedAlert || !currentPosition || !selectedAlert.location || 
-        selectedAlert.location.latitude == null || selectedAlert.location.longitude == null) {
-      return;
-    }
-
+    if (!mapRef.current || !selectedAlert || !currentPosition || !selectedAlert.location) return;
+    
     const bounds = new window.google.maps.LatLngBounds();
     bounds.extend(currentPosition);
     bounds.extend({
@@ -231,14 +232,10 @@ const AdminPanel = () => {
 
   const confirmDeleteAlert = async () => {
     const id = confirmDelete.alertId;
-    if (!id) {
-      console.log("no id present to delete") 
-      return;
-    }
-    try {
-      const deleteUrl = `http://localhost:5000/api/alerts/${id}`;
-      const response = await axios.delete(deleteUrl);
+    if (!id) return;
 
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/alerts/${id}`);
       if (response.status !== 200) {
         throw new Error(`Server responded with ${response.status}`);
       }
@@ -280,11 +277,11 @@ const AdminPanel = () => {
   return (
     <div className="admin-panel">
       <h1>Alerts Dashboard</h1>
-  
+
       {deleteStatus.show && (
         <div className={`status-message ${deleteStatus.type}`}>{deleteStatus.message}</div>
       )}
-  
+
       {confirmDelete.show && (
         <div className="delete-modal-overlay">
           <div className="delete-modal">
@@ -297,11 +294,11 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
-  
+
       <div className="dashboard-layout">
         <div className="map-container">
           <LoadScript 
-            googleMapsApiKey="AIzaSyCf4j40ugggMoTjxiJI1DceQA4eSHOxY5A" 
+            googleMapsApiKey="YOUR_api_KEY"
             libraries={libraries}
             onLoad={() => setGoogleLoaded(true)}
           >
@@ -311,9 +308,14 @@ const AdminPanel = () => {
               zoom={10}
               onLoad={(map) => {
                 mapRef.current = map;
-                if (selectedAlert && selectedAlert.location?.latitude != null && selectedAlert.location?.longitude != null) {
+                if (selectedAlert && selectedAlert.location?.latitude) {
                   map.panTo({ lat: selectedAlert.location.latitude, lng: selectedAlert.location.longitude });
                 }
+              }}
+              options={{
+                streetViewControl: false,
+                mapTypeControl: false,
+                fullscreenControl: false
               }}
             >
               {googleLoaded && directions && showDirections && (
@@ -322,7 +324,7 @@ const AdminPanel = () => {
                   options={{ polylineOptions: { strokeColor: '#2E86C1', strokeWeight: 5 } }}
                 />
               )}
-  
+
               {currentPosition && googleLoaded && (
                 <Marker
                   position={currentPosition}
@@ -336,9 +338,9 @@ const AdminPanel = () => {
                   }}
                 />
               )}
-  
+
               {googleLoaded && alerts.map((alert) =>
-                alert.location && alert.location.latitude != null && alert.location.longitude != null ? (
+                alert.location && alert.location.latitude ? (
                   <Marker
                     key={alert._id}
                     position={{ lat: alert.location.latitude, lng: alert.location.longitude }}
@@ -357,8 +359,8 @@ const AdminPanel = () => {
                   />
                 ) : null
               )}
-  
-              {googleLoaded && selectedAlert && selectedAlert.location?.latitude != null && selectedAlert.location?.longitude != null && (
+
+              {googleLoaded && selectedAlert && selectedAlert.location?.latitude && (
                 <InfoWindow
                   position={{ lat: selectedAlert.location.latitude, lng: selectedAlert.location.longitude }}
                   onCloseClick={() => {
@@ -388,9 +390,7 @@ const AdminPanel = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleDirections();
-                          if (showDirections) {
-                            zoomToFitRoute();
-                          }
+                          if (showDirections) zoomToFitRoute();
                         }}
                         style={{ padding: '5px 10px', backgroundColor: showDirections ? '#28a745' : '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
                       >
@@ -423,30 +423,30 @@ const AdminPanel = () => {
             </GoogleMap>
           </LoadScript>
         </div>
-        <div className="alerts-container">
+
+        {/* <div className="alerts-container">
           <h2>Recent Alerts</h2>
           {alerts.length === 0 ? (
             <p>No alerts found.</p>
           ) : (
             <div className="alerts-list">
-            {alerts.map((alert, index) => (
-              <div
-                key={`${alert._id}-${index}`} // Combine _id and index to ensure uniqueness
-                className={`alert-card ${alert.status} ${alert.type === 'sos' ? 'sos' : ''}`}
-                onClick={() => {
-                  if (alert.location?.latitude != null && alert.location?.longitude != null) {
-                    setSelectedAlert(alert);
-                    if (mapRef.current) mapRef.current.panTo({ lat: alert.location.latitude, lng: alert.location.longitude });
-                  }
-                }}
-              >
-                
+              {alerts.map((alert, index) => (
+                <div
+                  key={`${alert._id}-${index}`}
+                  className={`alert-card ${alert.status} ${alert.type === 'sos' ? 'sos' : ''}`}
+                  onClick={() => {
+                    if (alert.location?.latitude) {
+                      setSelectedAlert(alert);
+                      if (mapRef.current) mapRef.current.panTo({ lat: alert.location.latitude, lng: alert.location.longitude });
+                    }
+                  }}
+                >
                   <div className="alert-header">
                     <h3>{alert.userName || alert.title}</h3>
                     <span className="date">{new Date(alert.createdAt).toLocaleString()}</span>
                   </div>
                   <p className="message">{alert.message || alert.description}</p>
-                  {alert.location && alert.location.latitude != null && alert.location.longitude != null ? (
+                  {alert.location && alert.location.latitude ? (
                     <div className="location-details">
                       <p>
                         Location: {alert.location.latitude.toFixed(6)}, {alert.location.longitude.toFixed(6)}
@@ -460,6 +460,39 @@ const AdminPanel = () => {
                     <p className="location-details">Location: Unavailable</p>
                   )}
                   <div className="alert-actions">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        viewOnMap(alert);
+                      }}
+                      className="action-btn view-map"
+                      disabled={!alert.location?.latitude}
+                    >
+                      View on Map
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedAlert(alert);
+                        setShowDirections(true);
+                        zoomToFitRoute();
+                      }}
+                      className="action-btn show-route"
+                      disabled={!alert.location?.latitude}
+                    >
+                      Show Route
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openInGoogleMaps(alert);
+                      }}
+                      className="action-btn get-directions"
+                      disabled={!alert.location?.latitude}
+                    >
+                      Get Directions
+                    </button>
+
                     {alert.status === 'new' && (
                       <>
                         <button 
@@ -520,7 +553,7 @@ const AdminPanel = () => {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
