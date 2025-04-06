@@ -22,6 +22,8 @@ import EngagementLanding from './pages/EngagementLanding';
 import Chat from './pages/Chat';
 import SubmitFeedback from './pages/SubmitFeedback';
 import PostEventAnalysis from './pages/PostEventAnalyzer'; 
+import SosButton from './pages/SosButton';
+import AdminPanel from './pages/AdminPanel';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = authService.isAuthenticated();
@@ -61,6 +63,8 @@ function App() {
         <Route path="/event/:eventId/engage" element={<EngagementLanding />} />
         <Route path="/chat/:eventId" element={<Chat />} />
         <Route path="/submit-feedback/:eventId" element={<SubmitFeedback />} />
+        <Route path="/sos/:eventId" element={<SosButton />} />
+        <Route path="/admin-panel" element={<AdminPanel />} />
         <Route
           path="*"
           element={

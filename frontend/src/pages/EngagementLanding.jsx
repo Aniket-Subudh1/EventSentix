@@ -15,6 +15,7 @@ const EngagementLanding = () => {
         <Button onClick={() => navigate(`/chat/${eventId}`)}>💬 Join Chat</Button>
         <Button onClick={() => navigate(`/qna/${eventId}`)}>❓ Live Q&A</Button>
         <Button onClick={() => navigate(`/submit-feedback/${eventId}`)}>📝 Fill Survey</Button>
+        <Button onClick={() => navigate(`/sos/${eventId}`)}>❗SOS</Button>
       </div>
     </div>
   );

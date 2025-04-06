@@ -1,4 +1,6 @@
+// src/components/Alerts.js
 import React, { useState, useEffect, useContext, useCallback, memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { EventContext } from '../context/EventContext';
 import { SocketContext } from '../context/SocketContext';
 import { Card } from '../components/common/Card';
@@ -69,21 +71,18 @@ const formatDuration = (start, end) => {
   if (!start || !end) return 'N/A';
   const durationMs = new Date(end) - new Date(start);
   const minutes = Math.floor(durationMs / 60000);
-  
   if (minutes < 60) return `${minutes} min${minutes !== 1 ? 's' : ''}`;
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  
   if (hours < 24) return `${hours} hr${hours !== 1 ? 's' : ''} ${remainingMinutes} min${remainingMinutes !== 1 ? 's' : ''}`;
   const days = Math.floor(hours / 24);
   const remainingHours = hours % 24;
   return `${days} day${days !== 1 ? 's' : ''} ${remainingHours} hr${remainingHours !== 1 ? 's' : ''}`;
 };
 
-// AlertList component (unchanged logic, styled)
-const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, selectedIds, onSelectMultiple }) => {
+// AlertList component (modified for SOS redirect)
+const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, selectedIds, onSelectMultiple, onSosClick }) => {
   const isSelected = (id) => selectedIds.includes(id);
-  
   const toggleSelection = useCallback((id) => {
     if (isSelected(id)) {
       onSelectMultiple(selectedIds.filter(itemId => itemId !== id));
@@ -91,7 +90,7 @@ const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, select
       onSelectMultiple([...selectedIds, id]);
     }
   }, [selectedIds, onSelectMultiple]);
-  
+
   const toggleSelectAll = useCallback(() => {
     if (selectedIds.length === alerts.length) {
       onSelectMultiple([]);
@@ -99,7 +98,7 @@ const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, select
       onSelectMultiple(alerts.map(item => item._id));
     }
   }, [alerts, selectedIds, onSelectMultiple]);
-  
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-700">
@@ -150,12 +149,12 @@ const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, select
                 </div>
               </td>
               <td className="px-6 py-4">
-                <div className="text-sm font-medium text-white line-clamp-1">{alert.title}</div>
-                <div className="text-xs text-gray-400 line-clamp-1">{alert.description}</div>
+                <div className="text-sm font-medium text-white line-clamp-1">{alert.title || alert.userName}</div>
+                <div className="text-xs text-gray-400 line-clamp-1">{alert.description || alert.message}</div>
                 {alert.location && (
                   <div className="text-xs text-gray-400 flex items-center mt-1">
                     <MapPin size={12} className="mr-1" />
-                    {alert.location}
+                    {`${alert.location.latitude}, ${alert.location.longitude}`}
                   </div>
                 )}
               </td>
@@ -173,12 +172,21 @@ const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, select
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <button
-                    onClick={() => onViewDetail(alert)}
-                    className="text-[#9D174D] hover:text-[#C53070]"
-                  >
-                    View
-                  </button>
+                  {alert.type === 'sos' ? (
+                    <button
+                      onClick={() => onSosClick(alert._id)}
+                      className="text-[#9D174D] hover:text-[#C53070]"
+                    >
+                      View on Map
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onViewDetail(alert)}
+                      className="text-[#9D174D] hover:text-[#C53070]"
+                    >
+                      View
+                    </button>
+                  )}
                   {alert.status !== 'resolved' && (
                     <button
                       onClick={() => onStatusChange(alert._id, 'resolved')}
@@ -203,14 +211,13 @@ const AlertList = memo(({ alerts, onViewDetail, onStatusChange, onDelete, select
   );
 });
 
-// AlertFilter component (unchanged logic, styled)
+// AlertFilter component (unchanged)
 const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
   const [localFilters, setLocalFilters] = useState({ ...filters });
-  
   useEffect(() => {
     setLocalFilters(filters);
   }, [filters]);
-  
+
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setLocalFilters(prev => ({
@@ -218,7 +225,7 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
       [name]: value
     }));
   }, []);
-  
+
   const handleReset = useCallback(() => {
     const resetFilters = {
       severity: 'all',
@@ -233,13 +240,13 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
     setFilters(resetFilters);
     onApplyFilters(resetFilters);
   }, [setFilters, onApplyFilters]);
-  
+
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
     setFilters(localFilters);
     onApplyFilters(localFilters);
   }, [localFilters, setFilters, onApplyFilters]);
-  
+
   return (
     <Card className="mb-6 bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102">
       <form onSubmit={handleSubmit}>
@@ -262,7 +269,6 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
               <option value="low">Low</option>
             </select>
           </div>
-          
           <div>
             <label htmlFor="type" className="block text-sm font-medium text-gray-300">
               Type
@@ -280,7 +286,6 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
               ))}
             </select>
           </div>
-          
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-gray-300">
               Category
@@ -298,7 +303,6 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
               ))}
             </select>
           </div>
-          
           <div>
             <label htmlFor="status" className="block text-sm font-medium text-gray-300">
               Status
@@ -318,7 +322,6 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
               <option value="ignored">Ignored</option>
             </select>
           </div>
-          
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-gray-300">
               Start Date
@@ -332,7 +335,6 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
               onChange={handleChange}
             />
           </div>
-          
           <div>
             <label htmlFor="search" className="block text-sm font-medium text-gray-300">
               Search
@@ -348,7 +350,6 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
             />
           </div>
         </div>
-        
         <div className="mt-4 flex justify-end space-x-3">
           <Button
             type="button"
@@ -358,7 +359,6 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
           >
             Reset
           </Button>
-          
           <Button
             type="submit"
             variant="primary"
@@ -373,13 +373,13 @@ const AlertFilter = ({ filters, setFilters, onApplyFilters, alertTypes }) => {
   );
 };
 
-// AlertDetailModal component (unchanged logic, styled)
+// AlertDetailModal component (unchanged)
 const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  
+
   if (!alert) return null;
-  
+
   const handleStatusChange = async (status) => {
     try {
       setSubmitting(true);
@@ -391,12 +391,12 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
       setSubmitting(false);
     }
   };
-  
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Alert: ${alert.title}`}
+      title={`Alert: ${alert.title || alert.userName}`}
       size="lg"
       className="bg-gray-900 text-white"
     >
@@ -407,12 +407,11 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
               {getSeverityIcon(alert.severity)}
             </div>
             <div>
-              <h3 className="text-lg font-medium">{alert.title}</h3>
-              <p className="mt-1">{alert.description}</p>
+              <h3 className="text-lg font-medium">{alert.title || alert.userName}</h3>
+              <p className="mt-1">{alert.description || alert.message}</p>
             </div>
           </div>
         </div>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-sm font-medium text-gray-300 mb-2">Alert Details</h3>
@@ -420,50 +419,41 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <dt className="text-gray-400">Type:</dt>
                 <dd className="capitalize">{alert.type}</dd>
-                
                 <dt className="text-gray-400">Category:</dt>
                 <dd className="capitalize">{alert.category}</dd>
-                
                 <dt className="text-gray-400">Severity:</dt>
                 <dd className="capitalize">{alert.severity}</dd>
-                
                 <dt className="text-gray-400">Status:</dt>
                 <dd>
                   <span className={`px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${getStatusClass(alert.status)}`}>
                     {alert.status}
                   </span>
                 </dd>
-                
                 <dt className="text-gray-400">Created:</dt>
                 <dd>{formatDate(alert.createdAt)}</dd>
-                
                 {alert.resolvedAt && (
                   <>
                     <dt className="text-gray-400">Resolved:</dt>
                     <dd>{formatDate(alert.resolvedAt)}</dd>
-                    
                     <dt className="text-gray-400">Time to Resolve:</dt>
                     <dd>{formatDuration(alert.createdAt, alert.resolvedAt)}</dd>
                   </>
                 )}
-                
                 {alert.assignedTo && (
                   <>
                     <dt className="text-gray-400">Assigned To:</dt>
                     <dd>{alert.assignedTo}</dd>
                   </>
                 )}
-                
                 {alert.location && (
                   <>
                     <dt className="text-gray-400">Location:</dt>
-                    <dd>{alert.location}</dd>
+                    <dd>{`${alert.location.latitude}, ${alert.location.longitude}`}</dd>
                   </>
                 )}
               </dl>
             </div>
           </div>
-          
           <div>
             <h3 className="text-sm font-medium text-gray-300 mb-2">Status Updates</h3>
             <div className="bg-gray-800 rounded-md p-4 max-h-60 overflow-y-auto">
@@ -495,7 +485,6 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
             </div>
           </div>
         </div>
-        
         {alert.status !== 'resolved' && (
           <div>
             <h3 className="text-sm font-medium text-gray-300 mb-2">Update Status</h3>
@@ -513,7 +502,6 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                   placeholder="Add details about this status change..."
                 ></textarea>
               </div>
-              
               <div className="flex flex-wrap gap-2">
                 {alert.status === 'new' && (
                   <Button
@@ -527,7 +515,6 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                     Acknowledge
                   </Button>
                 )}
-                
                 {['new', 'acknowledged'].includes(alert.status) && (
                   <Button
                     variant="primary"
@@ -540,7 +527,6 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                     In Progress
                   </Button>
                 )}
-                
                 <Button
                   variant="success"
                   size="sm"
@@ -551,7 +537,6 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
                   {submitting ? <Loader size="sm" color="white" className="mr-1" /> : null}
                   Resolve
                 </Button>
-                
                 <Button
                   variant="secondary"
                   size="sm"
@@ -566,7 +551,6 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
             </div>
           </div>
         )}
-        
         {alert.relatedFeedback && alert.relatedFeedback.length > 0 && (
           <div>
             <h3 className="text-sm font-medium text-gray-300 mb-2">Related Feedback</h3>
@@ -600,7 +584,7 @@ const AlertDetailModal = ({ isOpen, onClose, alert, onStatusChange }) => {
   );
 };
 
-// CreateAlertModal component (unchanged logic, styled)
+// CreateAlertModal component (unchanged)
 const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) => {
   const [formData, setFormData] = useState({
     event: '',
@@ -611,16 +595,15 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
     category: 'general',
     location: ''
   });
-  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   useEffect(() => {
     if (eventId) {
       setFormData(prev => ({ ...prev, event: eventId }));
     }
   }, [eventId]);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -628,15 +611,13 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
       [name]: value
     });
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!formData.title || !formData.description) {
       setError('Please fill in all required fields');
       return;
     }
-    
     try {
       setLoading(true);
       setError(null);
@@ -657,7 +638,7 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
       setLoading(false);
     }
   };
-  
+
   return (
     <Modal
       isOpen={isOpen}
@@ -672,7 +653,6 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
             {error}
           </div>
         )}
-        
         <div className="space-y-4">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-300">
@@ -688,7 +668,6 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
               required
             />
           </div>
-          
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-300">
               Description *
@@ -703,7 +682,6 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
               required
             ></textarea>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="type" className="block text-sm font-medium text-gray-300">
@@ -721,7 +699,6 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
                 ))}
               </select>
             </div>
-            
             <div>
               <label htmlFor="severity" className="block text-sm font-medium text-gray-300">
                 Severity
@@ -740,7 +717,6 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
               </select>
             </div>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="category" className="block text-sm font-medium text-gray-300">
@@ -758,7 +734,6 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
                 ))}
               </select>
             </div>
-            
             <div>
               <label htmlFor="location" className="block text-sm font-medium text-gray-300">
                 Location (Optional)
@@ -775,7 +750,6 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
             </div>
           </div>
         </div>
-        
         <div className="mt-5 flex justify-end space-x-3">
           <Button
             type="button"
@@ -786,7 +760,6 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
           >
             Cancel
           </Button>
-          
           <Button
             type="submit"
             variant="primary"
@@ -802,15 +775,14 @@ const CreateAlertModal = ({ isOpen, onClose, onSubmit, eventId, alertTypes }) =>
   );
 };
 
-// BatchResolveModal component (unchanged logic, styled)
+// BatchResolveModal component (unchanged)
 const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
       setLoading(true);
       setError(null);
@@ -823,7 +795,7 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
       setLoading(false);
     }
   };
-  
+
   return (
     <Modal
       isOpen={isOpen}
@@ -838,12 +810,10 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
             {error}
           </div>
         )}
-        
         <div>
           <p className="text-gray-300">
             You are about to resolve {selectedCount} alert{selectedCount !== 1 ? 's' : ''}.
           </p>
-          
           <div className="mt-4">
             <label htmlFor="note" className="block text-sm font-medium text-gray-300">
               Resolution Note (Optional)
@@ -858,7 +828,6 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
             ></textarea>
           </div>
         </div>
-        
         <div className="mt-5 flex justify-end space-x-3">
           <Button
             type="button"
@@ -869,7 +838,6 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
           >
             Cancel
           </Button>
-          
           <Button
             type="submit"
             variant="success"
@@ -885,7 +853,7 @@ const BatchResolveModal = ({ isOpen, onClose, selectedCount, onSubmit }) => {
   );
 };
 
-// DeleteConfirmationModal component (unchanged logic, styled)
+// DeleteConfirmationModal component (unchanged)
 const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, isMultiple, count = 1, isDeleting }) => {
   return (
     <Modal
@@ -903,7 +871,6 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, isMultiple, count
           >
             Cancel
           </Button>
-          
           <Button
             variant="danger"
             onClick={onConfirm}
@@ -926,12 +893,11 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, isMultiple, count
   );
 };
 
-// AlertStats component (unchanged logic, styled)
+// AlertStats component (unchanged)
 const AlertStats = ({ alertCounts }) => {
   if (!alertCounts) {
     return <Loader className="text-[#9D174D] animate-spin" />;
   }
-  
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
       <Card className="bg-white/5 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
@@ -945,7 +911,6 @@ const AlertStats = ({ alertCounts }) => {
           </div>
         </div>
       </Card>
-      
       <Card className="bg-white/5 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <div className="flex items-start">
           <div className="mr-3">
@@ -957,7 +922,6 @@ const AlertStats = ({ alertCounts }) => {
           </div>
         </div>
       </Card>
-      
       <Card className="bg-white/5 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <div className="flex items-start">
           <div className="mr-3">
@@ -969,7 +933,6 @@ const AlertStats = ({ alertCounts }) => {
           </div>
         </div>
       </Card>
-      
       <Card className="bg-white/5 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <div className="flex items-start">
           <div className="mr-3">
@@ -985,24 +948,22 @@ const AlertStats = ({ alertCounts }) => {
   );
 };
 
-// Main Alerts component (unchanged logic, styled)
+// Main Alerts component (updated for SOS and redirect)
 const Alerts = () => {
   const { selectedEvent } = useContext(EventContext);
   const { newAlert } = useContext(SocketContext);
-  
+  const navigate = useNavigate();
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [alertCounts, setAlertCounts] = useState(null);
   const [alertTypes, setAlertTypes] = useState(null);
-  
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
     total: 0,
     totalPages: 0
   });
-  
   const [filters, setFilters] = useState({
     severity: 'all',
     type: 'all',
@@ -1012,7 +973,9 @@ const Alerts = () => {
     endDate: '',
     search: ''
   });
-  
+  const handleSosClick = (alertId) => {
+    navigate(`/admin-panel?alertId=${alertId}`);
+  };
   const [selectedAlert, setSelectedAlert] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -1022,7 +985,7 @@ const Alerts = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
-  
+
   useEffect(() => {
     const loadAlertTypes = async () => {
       try {
@@ -1033,36 +996,32 @@ const Alerts = () => {
         setError('Failed to load alert types');
       }
     };
-    
     loadAlertTypes();
   }, []);
-  
+
   useEffect(() => {
     if (selectedEvent) {
       fetchAlerts();
       fetchAlertCounts();
     }
   }, [selectedEvent, pagination.page]);
-  
+
   useEffect(() => {
-    if (newAlert && selectedEvent && newAlert.event === selectedEvent._id) {
+    if (newAlert && selectedEvent && (!newAlert.event || newAlert.event === selectedEvent._id)) {
       setAlerts(prev => [newAlert, ...prev]);
       fetchAlertCounts();
     }
   }, [newAlert, selectedEvent]);
-  
-  const fetchAlerts = async () => {
+
+  const fetchAlerts = useCallback(async () => {
     if (!selectedEvent) return;
-    
     try {
       setLoading(true);
       setError(null);
-      
       const queryParams = {
         page: pagination.page,
         limit: pagination.limit
       };
-      
       if (filters.severity !== 'all') queryParams.severity = filters.severity;
       if (filters.type !== 'all') queryParams.type = filters.type;
       if (filters.category !== 'all') queryParams.category = filters.category;
@@ -1070,9 +1029,8 @@ const Alerts = () => {
       if (filters.startDate) queryParams.startDate = filters.startDate;
       if (filters.endDate) queryParams.endDate = filters.endDate;
       if (filters.search) queryParams.search = filters.search;
-      
+
       const response = await alertService.getEventAlerts(selectedEvent._id, queryParams);
-      
       setAlerts(response.data);
       setPagination({
         page: response.pagination.page,
@@ -1086,11 +1044,10 @@ const Alerts = () => {
     } finally {
       setLoading(false);
     }
-  };
-  
+  }, [selectedEvent, pagination.page, pagination.limit, filters]);
+
   const fetchAlertCounts = async () => {
     if (!selectedEvent) return;
-    
     try {
       const counts = await alertService.getActiveAlertCount(selectedEvent._id);
       setAlertCounts(counts);
@@ -1098,16 +1055,16 @@ const Alerts = () => {
       console.error('Error fetching alert counts:', err);
     }
   };
-  
+
   const handleApplyFilters = useCallback(() => {
     setPagination(prev => ({ ...prev, page: 1 }));
     fetchAlerts();
   }, [fetchAlerts]);
-  
+
   const handlePageChange = useCallback((newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
   }, []);
-  
+
   const handleViewDetail = async (alert) => {
     try {
       const fullAlert = await alertService.getAlertById(alert._id);
@@ -1118,56 +1075,50 @@ const Alerts = () => {
       setError('Failed to load alert details. Please try again.');
     }
   };
-  
+
+
+
   const handleStatusChange = async (alertId, status, note = '') => {
     try {
       const updatedAlert = await alertService.updateAlertStatus(alertId, status, note);
-      
       setAlerts(prev => prev.map(alert => (
         alert._id === alertId ? updatedAlert : alert
       )));
-      
       if (selectedAlert && selectedAlert._id === alertId) {
         setSelectedAlert(updatedAlert);
       }
-      
       fetchAlertCounts();
-      
       return updatedAlert;
     } catch (err) {
       console.error('Error updating alert status:', err);
       throw err;
     }
   };
-  
+
   const handleCreateAlert = async (alertData) => {
     try {
       if (selectedEvent && !alertData.event) {
         alertData.event = selectedEvent._id;
       }
-      
       const newAlert = await alertService.createAlert(alertData);
-      
       setAlerts(prev => [newAlert, ...prev]);
       fetchAlertCounts();
-      
       return newAlert;
     } catch (err) {
       console.error('Error creating alert:', err);
       throw err;
     }
   };
-  
+
   const handleDelete = (alertId) => {
     setAlertToDelete(alertId);
     setDeleteMultiple(false);
     setShowDeleteModal(true);
   };
-  
+
   const handleDeleteConfirm = async () => {
     try {
       setIsDeleting(true);
-      
       if (deleteMultiple) {
         await Promise.all(selectedIds.map(id => alertService.deleteAlert(id)));
         setAlerts(prev => prev.filter(alert => !selectedIds.includes(alert._id)));
@@ -1176,7 +1127,6 @@ const Alerts = () => {
         await alertService.deleteAlert(alertToDelete);
         setAlerts(prev => prev.filter(alert => alert._id !== alertToDelete));
       }
-      
       fetchAlertCounts();
       setShowDeleteModal(false);
     } catch (err) {
@@ -1186,12 +1136,12 @@ const Alerts = () => {
       setIsDeleting(false);
     }
   };
-  
+
   const handleResolveSelected = () => {
     if (selectedIds.length === 0) return;
     setShowBatchModal(true);
   };
-  
+
   const handleBatchResolve = async (note) => {
     try {
       await alertService.resolveMultipleAlerts(selectedIds, note);
@@ -1203,18 +1153,18 @@ const Alerts = () => {
       throw err;
     }
   };
-  
+
   const handleDeleteSelected = () => {
     if (selectedIds.length === 0) return;
     setDeleteMultiple(true);
     setShowDeleteModal(true);
   };
-  
+
   const handleRefresh = () => {
     fetchAlerts();
     fetchAlertCounts();
   };
-  
+
   if (!selectedEvent) {
     return (
       <div className="flex flex-col items-center justify-center h-96 animate-fade-in bg-[#00001A] rounded-xl">
@@ -1233,7 +1183,7 @@ const Alerts = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="p-6 bg-[#00001A] min-h-screen">
       <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl">
@@ -1264,22 +1214,18 @@ const Alerts = () => {
           </div>
         </div>
       </div>
-      
       {error && (
         <div className="mb-6 rounded-md bg-red-900/20 p-4 text-sm text-red-300">
           {error}
         </div>
       )}
-      
       <AlertStats alertCounts={alertCounts} />
-      
       <AlertFilter
         filters={filters}
         setFilters={setFilters}
         onApplyFilters={handleApplyFilters}
         alertTypes={alertTypes}
       />
-      
       <Card className="mb-4 bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 transform transition-all duration-300 hover:shadow-2xl hover:scale-102">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -1309,7 +1255,6 @@ const Alerts = () => {
             </div>
           )}
         </div>
-        
         {loading ? (
           <div className="flex h-64 items-center justify-center">
             <Loader size="lg" className="text-[#9D174D] animate-spin" />
@@ -1331,6 +1276,7 @@ const Alerts = () => {
               onDelete={handleDelete}
               selectedIds={selectedIds}
               onSelectMultiple={setSelectedIds}
+              onSosClick={handleSosClick}
             />
             {pagination.totalPages > 1 && (
               <div className="mt-4 flex justify-center">
@@ -1362,14 +1308,12 @@ const Alerts = () => {
           </>
         )}
       </Card>
-      
       <AlertDetailModal
         isOpen={showDetailModal}
         onClose={() => setShowDetailModal(false)}
         alert={selectedAlert}
         onStatusChange={handleStatusChange}
       />
-      
       <CreateAlertModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
@@ -1377,14 +1321,12 @@ const Alerts = () => {
         eventId={selectedEvent._id}
         alertTypes={alertTypes}
       />
-      
       <BatchResolveModal
         isOpen={showBatchModal}
         onClose={() => setShowBatchModal(false)}
         selectedCount={selectedIds.length}
         onSubmit={handleBatchResolve}
       />
-      
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

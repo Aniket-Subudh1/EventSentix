@@ -26,6 +26,7 @@ router.get('/health', (req, res) => {
   });
 });
 
+// Documentation endpoint
 router.get('/docs', (req, res) => {
   res.status(200).json({
     success: true,

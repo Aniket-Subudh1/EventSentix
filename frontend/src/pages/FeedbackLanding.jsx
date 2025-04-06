@@ -17,6 +17,10 @@ const FeedbackLanding = ({ match }) => {
     window.location.href = `/submit-feedback/${eventId}`;
   };
 
+  const handleOnSOSClick = () => {
+    window.location.href = `/sos/${eventId}`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center px-4 py-8">
       <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full space-y-6">
@@ -36,6 +40,18 @@ const FeedbackLanding = ({ match }) => {
             <div className="text-left">
               <div className="font-semibold">Live Chat</div>
               <div className="text-sm text-gray-500">Discuss your experience in real-time</div>
+            </div>
+          </Button>
+
+          <Button
+            variant="outline"
+            fullWidth
+            onClick={handleOnSOSClick}
+            icon={<Edit size={20} className="mr-2" />}
+          >
+            <div className="text-left">
+              <div className="font-semibold">SOS</div>
+              <div className="text-sm text-gray-500">Emergency Event Service</div>
             </div>
           </Button>
 
